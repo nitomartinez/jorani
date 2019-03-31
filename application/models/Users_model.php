@@ -232,8 +232,9 @@ class Users_model extends CI_Model {
             'contract' => $this->input->post('contract'),
             'identifier' => $this->input->post('identifier'),
             'language' => $this->input->post('language'),
-            'timezone' => $this->input->post('timezone'),
-            'random_hash' => rtrim(strtr(base64_encode($this->getRandomBytes(24)), '+/', '-_'), '='),
+            'timezone' => $this->input->post('timezone')
+            // 'timezone' => $this->input->post('timezone'),
+            // 'random_hash' => rtrim(strtr(base64_encode($this->getRandomBytes(24)), '+/', '-_'), '='),
         );
 
         if ($this->input->post('entity') != NULL && $this->input->post('entity') != '') {
@@ -314,7 +315,7 @@ class Users_model extends CI_Model {
         $this->db->set('email', $email);
         $this->db->set('password', $hash);
         $this->db->set('role', $role);
-        $this->db->set('random_hash', rtrim(strtr(base64_encode($this->getRandomBytes(24)), '+/', '-_'), '='));
+        // $this->db->set('random_hash', rtrim(strtr(base64_encode($this->getRandomBytes(24)), '+/', '-_'), '='));
         if (isset($manager)) $this->db->set('manager', $manager);
         if (isset($organization)) $this->db->set('organization', $organization);
         if (isset($contract)) $this->db->set('contract', $contract);
@@ -506,7 +507,7 @@ class Users_model extends CI_Model {
             'is_admin' => $is_admin,
             'is_hr' => $is_hr,
             'manager' => $row->manager,
-            'random_hash' => $row->random_hash,
+            // 'random_hash' => $row->random_hash,
             'logged_in' => TRUE
         );
         $this->session->set_userdata($newdata);
@@ -831,22 +832,22 @@ class Users_model extends CI_Model {
         }
     }
 
-    /**
-     * Check if a given hash is associated to an existing user
-     * @param string $randomHash Random Hash associated to user
-     * @return bool TRUE if the user was found, FALSE otherwise
-     * @author Benjamin BALET <benjamin.balet@gmail.com>
-     */
-    public function checkUserByHash($randomHash) {
-        $this->db->from('users');
-        $this->db->where('random_hash', $randomHash);
-        $query = $this->db->get();
-        if ($query->num_rows() == 0) {
-            return FALSE;
-        } else {
-            return TRUE;
-        }
-    }
+    // /**
+    //  * Check if a given hash is associated to an existing user
+    //  * @param string $randomHash Random Hash associated to user
+    //  * @return bool TRUE if the user was found, FALSE otherwise
+    //  * @author Benjamin BALET <benjamin.balet@gmail.com>
+    //  */
+    // public function checkUserByHash($randomHash) {
+    //     $this->db->from('users');
+    //     $this->db->where('random_hash', $randomHash);
+    //     $query = $this->db->get();
+    //     if ($query->num_rows() == 0) {
+    //         return FALSE;
+    //     } else {
+    //         return TRUE;
+    //     }
+    // }
 
     /**
      * Generate some random bytes by using openssl, dev/urandom or random
