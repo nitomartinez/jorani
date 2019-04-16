@@ -51,6 +51,13 @@ echo form_open('leaves/create', $attributes) ?>
     <?php } else { ?>
     <input type="text" name="duration" id="duration" value="<?php echo set_value('duration'); ?>" />
     <?php } ?>
+    <?php if ($this->config->item('allow_hourly_leave_duration') == TRUE) { ?>
+    <select name="durationtype" id="durationtype">
+        <option value="days" selected><?php echo lang('days');?></option>
+        <option value="hours"><?php echo lang('hours');?></option>
+    </select><br />
+    <?php } ?>
+
 
     <span style="margin-left: 2px;position: relative;top: -5px;" id="spnDayType"></span>
 
