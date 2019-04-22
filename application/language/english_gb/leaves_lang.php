@@ -59,6 +59,7 @@ $lang['leaves_create_field_start'] = 'Start Date';
 $lang['leaves_create_field_end'] = 'End Date';
 $lang['leaves_create_field_type'] = 'Leave type';
 $lang['leaves_create_field_duration'] = 'Duration';
+$lang['leaves_create_field_duration_type'] = 'Days/Hours';
 $lang['leaves_create_field_duration_message'] = 'You are exceeding your entitled days';
 $lang['leaves_create_field_overlapping_message'] = 'You have requested another leave request within the same dates.';
 $lang['leaves_create_field_cause'] = 'Cause (optional)';
@@ -70,6 +71,7 @@ $lang['leaves_create_flash_msg_error'] = 'The leave request has been succesfully
 
 $lang['leaves_flash_spn_list_days_off'] = '%s non-working days in the period';
 $lang['leaves_flash_msg_overlap_dayoff'] = 'Your leave request matches with a non-working day.';
+$lang['leaves_flash_msg_hourly_reports_beyond_limits'] = 'Your hourly leave request can only be used on the same day and not more than 8 hours';
 
 $lang['leaves_cancellation_flash_msg_error'] = 'You can\'t cancel this leave request';
 $lang['leaves_cancellation_flash_msg_success'] = 'The cancellation request has been successfully sent';
