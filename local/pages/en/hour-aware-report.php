@@ -1,14 +1,16 @@
 <?php
 
+$GLOBALS['debug'] = FALSE;
+
 $this->lang->load('requests', $this->language);
 $this->lang->load('global', $this->language);
 
 //require_once FCPATH . "vendor/autoload.php";
 
 $this->load->model('organization_model');
-//$ci = $this;
+
 function getLeaveTypes($ci) {
-    $sql = <<<EOF
+$sql = <<<EOF
 -- 
 -- The list of leave types
 
@@ -265,21 +267,19 @@ EOF4;
     
 
     $query .= $queryend;
-    echo nl2br($createtemptable);
+    if ($GLOBALS['debug'])
+        echo nl2br($createtemptable);
 
     $droptemptable = "drop temporary table $tablename";
 
     $createoutput = $ci->db->query($createtemptable);
-    echo "error temptable:".print_r($ci->db->error());
-//    echo "error_message temptable:".print_r($ci->db->_error_message());
-    // TODO check for error
-    echo "<br/><br/>";
-    echo nl2br($query);
+    if ($GLOBALS['debug'])
+        echo nl2br($query);
 
     $queryresult = $ci->db->query($query);
     $queryresult2 = $ci->db->query("select * from $tablename");
-    echo "error:".print_r($ci->db->error());
-  //  echo "error_message:".print_r($ci->db->_error_message());
+    if ($GLOBALS['debug'])
+        echo "error:".print_r($ci->db->error());
     $rows2 = $queryresult2->result_array();
     $rows = $queryresult->result_array();
     $dropoutput = $ci->db->query($droptemptable);
@@ -363,42 +363,19 @@ EOF4;
     </div>
 </div>
 
-<div id="testpre">
-<pre>
-<?php
-$types = getLeaveTypes($this);
-?>
-</pre>
-</div>
-
-<div id="mytest">
-<table>
-<?php 
-foreach ($types as $id => $type) {
-?>
-<tr>
-<td><?= $id ?>:<?= $type ?></td>
-</tr>
-<?php } ?>
-</table>
-
-</div>
-hola
 
 <div id="mytest2">
-adios
 <table>
 <?php 
 $startdate="2019-04-01";
 $enddate="2019-04-30";
 $userids = getUserIdsWithLeavesBetweenDates($this, $startdate, $enddate);
 $leaves = getLeavesBetweenDates($this, $startdate, $enddate);
-echo print_r($leaves);
+//echo print_r($leaves);
 
 foreach ($leaves as $row ) {
 // TODO table header
 ?>
-hola
 <tr>
 <?php foreach ($row as $key => $value) {
 ?>
