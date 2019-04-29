@@ -1,6 +1,6 @@
 <?php
 
-$GLOBALS['debug'] = FALSE;
+$GLOBALS['debug'] = TRUE;
 
 $this->lang->load('requests', $this->language);
 $this->lang->load('global', $this->language);
@@ -250,6 +250,7 @@ EOF;
 select userid,firstname,lastname
 EOF2;
     $queryend = <<<EOF3
+  , SUM(duration) as total
   from $tablename
   group by userid
 EOF3;
@@ -267,8 +268,10 @@ EOF4;
     
 
     $query .= $queryend;
-    if ($GLOBALS['debug'])
+    if ($GLOBALS['debug']) {
         echo nl2br($createtemptable);
+        echo "<br/>";
+    }
 
     $droptemptable = "drop temporary table $tablename";
 
@@ -278,8 +281,10 @@ EOF4;
 
     $queryresult = $ci->db->query($query);
     $queryresult2 = $ci->db->query("select * from $tablename");
-    if ($GLOBALS['debug'])
+    if ($GLOBALS['debug']) {
         echo "error:".print_r($ci->db->error());
+         echo "<br/>";
+    }
     $rows2 = $queryresult2->result_array();
     $rows = $queryresult->result_array();
     $dropoutput = $ci->db->query($droptemptable);
@@ -379,7 +384,7 @@ foreach ($leaves as $row ) {
 <tr>
 <?php foreach ($row as $key => $value) {
 ?>
-<td><?= $value ?></td>
+<td><?= $key ?> = <?= $value ?></td>
 <?php } ?>
 
 </tr>
