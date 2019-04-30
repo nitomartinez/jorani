@@ -300,6 +300,12 @@ EOF4;
 
 <div class="row-fluid">
     <div class="span4">
+        <label for="viz_startdate"><?php echo lang('leaves_create_field_start');?>
+            <input type="text" name="viz_startdate" id="startdate" />
+        </label>
+        <label for="viz_enddate"><?php echo lang('leaves_create_field_end');?>
+            <input type="text" name="viz_enddate" id="enddate" />
+        </label>
         <label for="cboMonth"><?php echo lang('reports_leaves_month_field');?>
             <select name="cboMonth" id="cboMonth">
                 <?php for ($ii=1; $ii<13;$ii++) {
@@ -427,6 +433,8 @@ $(document).ready(function() {
     moment.locale('<?php echo $language_code;?>');
     $("#refdate").val(moment().format('L'));
     $('#refdate').datepicker();
+    $('#startdate').datepicker();
+    $('#enddate').datepicker();
 
     $("#frmSelectEntity").alert();
 
