@@ -7,7 +7,9 @@
  * @since         0.2.0
  */
 
-if (!defined('BASEPATH')) { exit('No direct script access allowed'); }
+if (!defined('BASEPATH')) {
+    exit('No direct script access allowed');
+}
 
 /**
  * This classe loads:
@@ -15,13 +17,15 @@ if (!defined('BASEPATH')) { exit('No direct script access allowed'); }
  *  - the system reports implemented into Jorani.
  * The custom reports need to be implemented into local/pages/{lang}/ (see Controller Page)
  */
-class Reports extends CI_Controller {
+class Reports extends CI_Controller
+{
 
     /**
      * Default constructor
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         setUserContext($this);
         $this->lang->load('reports', $this->language);
@@ -32,7 +36,8 @@ class Reports extends CI_Controller {
      * List the available custom reports (provided they are described into local/reports/*.ini)
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function index() {
+    public function index()
+    {
         $this->auth->checkIfOperationIsAllowed('report_list');
         $data = getUserContext($this);
         $this->lang->load('datatable', $this->language);
@@ -40,7 +45,7 @@ class Reports extends CI_Controller {
         $reports = array();
         //List all the available reports
         $files = glob(FCPATH . '/local/reports/*.ini');
-        foreach($files as $file) {
+        foreach ($files as $file) {
             $ini_array = parse_ini_file($file, TRUE);
             //Test if the report is available for the language being used
             if (array_key_exists($this->language_code, $ini_array)) {
@@ -66,7 +71,8 @@ class Reports extends CI_Controller {
      * @param string $refTmp Optional Unix timestamp (set a date of reference for the report).
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function balance($refTmp = NULL) {
+    public function balance($refTmp = NULL)
+    {
         $this->auth->checkIfOperationIsAllowed('native_report_balance');
         $data = getUserContext($this);
         $refDate = date("Y-m-d");
@@ -86,7 +92,8 @@ class Reports extends CI_Controller {
      * Ajax end-point : execute the balance report
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function executeBalanceReport() {
+    public function executeBalanceReport()
+    {
         $this->auth->checkIfOperationIsAllowed('native_report_balance');
         $this->load->model('leaves_model');
         $this->load->model('types_model');
@@ -117,11 +124,11 @@ class Reports extends CI_Controller {
 
             $summary = $this->leaves_model->getLeaveBalanceForEmployee($user->id, TRUE, $refDate);
             if (!is_null($summary)) {
-              if (count($summary) > 0 ) {
-                  foreach ($summary as $key => $value) {
-                      $result[$user->id][$key] = round($value[1] - $value[0], 3, PHP_ROUND_HALF_DOWN);
-                  }
-              }
+                if (count($summary) > 0) {
+                    foreach ($summary as $key => $value) {
+                        $result[$user->id][$key] = round($value[1] - $value[0], 3, PHP_ROUND_HALF_DOWN);
+                    }
+                }
             }
         }
 
@@ -152,22 +159,22 @@ class Reports extends CI_Controller {
         $alerts = $this->leaves_model->detectBalanceProblems();
         if (count($alerts)) {
             $table = "<div class='alert'>" .
-                     "<button type='button' class='close' data-dismiss='alert'>&times;</button>" .
-                     "<a href='" . base_url() . "admin/diagnostic#balance'>" .
-                     "<i class='mdi mdi-alert'></i>" .
-                     "&nbsp;Error</a>" .
-                     "</div>";
+                "<button type='button' class='close' data-dismiss='alert'>&times;</button>" .
+                "<a href='" . base_url() . "admin/diagnostic#balance'>" .
+                "<i class='mdi mdi-alert'></i>" .
+                "&nbsp;Error</a>" .
+                "</div>";
         }
         $table .= '<table class="table table-bordered table-hover">' .
-                    '<thead>' .
-                        '<tr>' .
-                            $thead .
-                        '</tr>' .
-                    '</thead>' .
-                    '<tbody>' .
-                        $tbody .
-                    '</tbody>' .
-                '</table>';
+            '<thead>' .
+            '<tr>' .
+            $thead .
+            '</tr>' .
+            '</thead>' .
+            '<tbody>' .
+            $tbody .
+            '</tbody>' .
+            '</table>';
         $this->output->set_output($table);
     }
 
@@ -175,7 +182,8 @@ class Reports extends CI_Controller {
      * Export the balance report into Excel
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function exportBalanceReport() {
+    public function exportBalanceReport()
+    {
         $this->auth->checkIfOperationIsAllowed('native_report_balance');
         $this->load->model('leaves_model');
         $this->load->model('types_model');
@@ -193,7 +201,8 @@ class Reports extends CI_Controller {
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      * @since 0.4.3
      */
-    public function leaves() {
+    public function leaves()
+    {
         $this->auth->checkIfOperationIsAllowed('native_report_leaves');
         $data = getUserContext($this);
         $data['title'] = lang('reports_leaves_title');
@@ -210,7 +219,8 @@ class Reports extends CI_Controller {
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      * @since 0.4.3
      */
-    public function executeLeavesReport() {
+    public function executeLeavesReport()
+    {
         $this->auth->checkIfOperationIsAllowed('native_report_leaves');
         $this->lang->load('leaves', $this->language);
 
@@ -224,7 +234,7 @@ class Reports extends CI_Controller {
         if ($month == 0) {
             $start = sprintf('%d-01-01', $year);
             $end = sprintf('%d-12-31', $year);
-            $total_days = date("z", mktime(0,0,0,12,31,$year)) + 1;
+            $total_days = date("z", mktime(0, 0, 0, 12, 31, $year)) + 1;
         } else {
             $start = sprintf('%d-%02d-01', $year, $month);
             $lastDay = date("t", strtotime($start));    //last day of selected month
@@ -258,7 +268,7 @@ class Reports extends CI_Controller {
             //If the user has selected All months
             if ($month == 0) {
                 $leave_duration = 0;
-                for ($ii = 1; $ii <13; $ii++) {
+                for ($ii = 1; $ii < 13; $ii++) {
                     $linear = $this->leaves_model->linear($user->id, $ii, $year, FALSE, FALSE, TRUE, FALSE);
                     $leave_duration += $this->leaves_model->monthlyLeavesDuration($linear);
                     $leaves_detail = $this->leaves_model->monthlyLeavesByType($linear);
@@ -269,7 +279,7 @@ class Reports extends CI_Controller {
                                 $result[$user->id][$type['name']] = 0;
                             }
                             $result[$user->id][$type['name']] +=
-                                    $leaves_detail[$type['name']];
+                                $leaves_detail[$type['name']];
                         } else {
                             $result[$user->id][$type['name']] = '';
                         }
@@ -324,25 +334,26 @@ class Reports extends CI_Controller {
                     $tbody .= '<tr><td colspan="' . count($row) . '">';
                     $tbody .= '<table class="table table-bordered table-hover" style="width: auto !important;">';
                     $tbody .= '<thead><tr>';
-                    $tbody .= '<th>' . lang('leaves_index_thead_id'). '</th>';
-                    $tbody .= '<th>' . lang('leaves_index_thead_start_date'). '</th>';
-                    $tbody .= '<th>' . lang('leaves_index_thead_end_date'). '</th>';
-                    $tbody .= '<th>' . lang('leaves_index_thead_type'). '</th>';
-                    $tbody .= '<th>' . lang('leaves_index_thead_duration'). '</th>';
+                    $tbody .= '<th>' . lang('leaves_index_thead_id') . '</th>';
+                    $tbody .= '<th>' . lang('leaves_index_thead_start_date') . '</th>';
+                    $tbody .= '<th>' . lang('leaves_index_thead_end_date') . '</th>';
+                    $tbody .= '<th>' . lang('leaves_index_thead_type') . '</th>';
+                    $tbody .= '<th>' . lang('leaves_index_thead_duration') . '</th>';
                     $tbody .= '</tr></thead>';
                     $tbody .= '<tbody>';
                     //Iterate on leave requests
                     foreach ($leave_requests[$user_id] as $request) {
+                        //var_dump($request);
                         $date = new DateTime($request['startdate']);
                         $startdate = $date->format(lang('global_date_format'));
                         $date = new DateTime($request['enddate']);
                         $enddate = $date->format(lang('global_date_format'));
                         $tbody .= '<tr>';
-                        $tbody .= '<td><a href="' . base_url() . 'leaves/view/'. $request['id']. '" target="_blank">'. $request['id']. '</a></td>';
-                        $tbody .= '<td>'. $startdate . ' (' . lang($request['startdatetype']). ')</td>';
-                        $tbody .= '<td>'. $enddate . ' (' . lang($request['enddatetype']). ')</td>';
-                        $tbody .= '<td>'. $request['type'] . '</td>';
-                        $tbody .= '<td>'. $request['duration'] . '</td>';
+                        $tbody .= '<td><a href="' . base_url() . 'leaves/view/' . $request['id'] . '" target="_blank">' . $request['id'] . '</a></td>';
+                        $tbody .= '<td>' . $startdate . ' (' . lang($request['startdatetype']) . ')</td>';
+                        $tbody .= '<td>' . $enddate . ' (' . lang($request['enddatetype']) . ')</td>';
+                        $tbody .= '<td>' . $request['type'] . '</td>';
+                        $tbody .= '<td>' . $request['duration'] . '</td>';
                         $tbody .= '</tr>';
                     }
                     $tbody .= '</tbody>';
@@ -355,15 +366,15 @@ class Reports extends CI_Controller {
             $line++;
         }
         $table = '<table class="table table-bordered table-hover">' .
-                    '<thead>' .
-                        '<tr>' .
-                            $thead .
-                        '</tr>' .
-                    '</thead>' .
-                    '<tbody>' .
-                        $tbody .
-                    '</tbody>' .
-                '</table>';
+            '<thead>' .
+            '<tr>' .
+            $thead .
+            '</tr>' .
+            '</thead>' .
+            '<tbody>' .
+            $tbody .
+            '</tbody>' .
+            '</table>';
         $this->output->set_output($table);
     }
 
@@ -372,7 +383,8 @@ class Reports extends CI_Controller {
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      * @since 0.4.3
      */
-    public function exportLeavesReport() {
+    public function exportLeavesReport()
+    {
         $this->auth->checkIfOperationIsAllowed('native_report_leaves');
         $this->lang->load('leaves', $this->language);
         $this->load->model('organization_model');
@@ -387,4 +399,220 @@ class Reports extends CI_Controller {
         $this->load->view('reports/leaves/export', $data);
     }
 
+    /**
+     * Report leaves request between two dates.
+     */
+    public function executeLeavesReportBetweenDates()
+    {
+        $this->auth->checkIfOperationIsAllowed('native_report_leaves');
+        $this->lang->load('leaves', $this->language);
+
+        $startdate = $this->input->get("startdate") === FALSE ? 0 : $this->input->get("startdate");
+        $enddate = $this->input->get("enddate") === FALSE ? 0 : $this->input->get("enddate");
+        $entity = $this->input->get("entity") === FALSE ? 0 : $this->input->get("entity");
+        $children = filter_var($this->input->get("children"), FILTER_VALIDATE_BOOLEAN);
+        $requests = filter_var($this->input->get("requests"), FILTER_VALIDATE_BOOLEAN);
+
+        //echo $startdate . "\n";
+        //echo $enddate;
+        //Compute facts about dates and the selected month
+        if ($startdate == 0 || $enddate == 0) {
+            //$start = new DateTime('first day of January ' . date('Y'));
+            $start = date('Y-01-01');
+            //var_dump($start);
+            //$end = new DateTime('last day of December ' . date('Y'));
+            $end = date('Y-12-31');
+            //var_dump($end);
+            $interval = abs(strtotime($end) - strtotime($start));
+            $intervalDays = floor($interval / (60 * 60 * 24));
+
+            printf("%d days\n", $intervalDays);
+            // %a will output the total number of days.
+            //echo $interval->format('%a total days')."\n";
+
+            // While %d will only output the number of days not already covered by the
+            // month.
+            //echo $interval->format('%m month, %d days');
+        } else {
+            $start = $startdate;
+            //$lastDay = date("t", strtotime($start));    //$endDate + last day of selected month
+            $end = $enddate;
+            //var_dump($start, $end);
+            $interval = abs(strtotime($end) - strtotime($start));
+            $intervalDays = ($interval / (60 * 60 * 24));
+            //var_dump($intervalDays);
+            //$total_days = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        }
+
+
+        $this->load->model('organization_model');
+        $this->load->model('leaves_model');
+        $this->load->model('types_model');
+        $this->load->model('dayoffs_model');
+        $types = $this->types_model->getTypes();
+
+        //Iterate on all employees of the entity
+        //$users = $this->organization_model->allEmployees($entity, $children);
+        //$leaves = array();
+        //echo $this->leaves_model->getCosa();
+        $leavesBetweenDates = $this->leaves_model->getLeavesBetweenDates($start, $end);
+        //$usersIds = $this->leaves_model->getUserIdsWithLeavesBetweenDates($start, $end);
+        //var_dump($leavesBetweenDates);
+        //var_dump($usersIds);
+
+        //$leaves = $this->leaves_model->getLeavesBetweenDatesNueva($start, $end);
+        //var_dump($rows);
+        $result = array();
+        $leave_requests = array();
+        
+        foreach ($leavesBetweenDates as $leave) {
+
+            //var_dump($leave);
+           
+            // FIXME: PROBLEMA CON ID //
+           /* echo $result['id'] = $leave['id'];
+            echo $result['userid'] = $leave['userid'];*/
+
+            $result[$leave['id']]['id'] = $leave['id'];
+            $result[$leave['id']]['userid'] = $leave['userid'];
+            $result[$leave['id']]['firstname'] = $leave['firstname'];
+            $result[$leave['id']]['lastname'] = $leave['lastname'];
+            $result[$leave['id']]['type'] = $leave['type'];
+            $result[$leave['id']]['leavetype'] = $leave['leavetype'];
+            $result[$leave['id']]['leavestatus '] = $leave['leavestatus'];
+            $result[$leave['id']]['startdate'] = $leave['startdate'];
+            $result[$leave['id']]['enddate'] = $leave['enddate'];
+            $result[$leave['id']]['duration'] = $leave['duration'];
+            $result[$leave['id']]['durationoutsideofperiod'] = $leave['durationoutsideofperiod'];
+            $result[$leave['id']]['daysoffoutsideofperiod'] = $leave['daysoffoutsideofperiod'];
+            $result[$leave['id']]['halfdayadjustment'] = $leave['halfdayadjustment'];
+            $result[$leave['id']]['effectiveduration'] = $leave['effectiveduration'];
+
+            //$linear = $this->leaves_model->linearBetweenDates($leave['id'], $start, $end, FALSE, FALSE, TRUE, FALSE);
+            //$leave_duration = $this->leaves_model->monthlyLeavesDuration($linear);
+            //$leaves_detail = $this->leaves_model->monthlyLeavesByType($linear);
+            if ($requests) $leave_requests[$leave['id']] = $this->leaves_model->getLeavesBetweenDates($start, $end);
+            
+            //Init type columns
+            // foreach ($types as $type) {
+            //     if (array_key_exists($type['name'], $leaves_detail)) {
+            //         $result[$leave['id']][$type['name']] = $leaves_detail[$type['name']];
+            //     } else {
+            //         $result[$leave['id']][$type['name']] = '';
+            //     }
+            // }
+            
+            //var_dump($requests);
+            //}
+            /*echo $result[$user->id]['leave_duration'] = $leave_duration . "\n";
+            echo $result[$user->id]['intervalDays'] = $intervalDays . "\n";
+            echo $result[$user->id]['non_working_days'] = $non_working_days . "\n";
+            echo $result[$user->id]['work_duration'] = $work_duration . "\n";*/
+        }
+
+        $table = '';
+        $thead = '';
+        $tbody = '';
+        $line = 2;
+        $i18 = array("id", "userid", "firstname", "lastname", "type", "leavetype", "leavestatus", "startdate", "enddate", "duration", "durationoutsideofperiod", "daysoffoutsideofperiod", "halfdayadjustment", "effectiveduration");
+        //var_dump($result);
+       
+        foreach ($result as $user_id => $row) {
+            $index = 1;
+            $tbody .= '<tr>';
+            //var_dump($row);
+            foreach ($row as $key => $value) {
+                //var_dump($value);
+                if ($line == 2) {
+                        if (in_array($key, $i18)) {
+                            //echo $key;
+                            $thead .= '<th>' . $key . '</th>';
+                        } else {
+                            $thead .= '<th>' . $key . '</th>';
+                        }
+                    
+                }
+                if ($key == 'id') {
+                    $tbody .= '<td><a href="' . base_url() . 'leaves/view/' . $value . '" target="_blank">' . $value . '</a></td>';
+                } else {
+                    $tbody .= '<td>' . $value . '</td>';
+                }
+                //var_dump($key);
+                //var_dump($value);
+
+                $index++;
+            }
+            $tbody .= '</tr>';
+            //Display a nested table listing the leave requests
+            if ($requests) {
+                if (count($leave_requests[$user_id])) {
+                    $tbody .= '<tr><td colspan="' . count($row) . '">';
+                    $tbody .= '<table class="table table-bordered table-hover" style="width: auto !important;">';
+                    $tbody .= '<thead><tr>';
+                    $tbody .= '<th>' . lang('leaves_index_thead_id') . '</th>';
+                    $tbody .= '<th>' . lang('leaves_index_thead_start_date') . '</th>';
+                    $tbody .= '<th>' . lang('leaves_index_thead_end_date') . '</th>';
+                    $tbody .= '<th>' . lang('leaves_index_thead_type') . '</th>';
+                    $tbody .= '<th>' . lang('leaves_index_thead_duration') . '</th>';
+                    $tbody .= '</tr></thead>';
+                    $tbody .= '<tbody>';
+                    //Iterate on leave requests
+                    //var_dump($leave_requests[$user_id]);
+                    foreach ($leave_requests[$user_id] as $request) {
+                        //var_dump($request);
+                        $date = new DateTime($request['startdate']);
+                        $startdate = $date->format(lang('global_date_format'));
+                        $date = new DateTime($request['enddate']);
+                        $enddate = $date->format(lang('global_date_format'));
+                        $tbody .= '<tr>';
+                        $tbody .= '<td><a href="' . base_url() . 'leaves/view/' . $request['id'] . '" target="_blank">' . $request['id'] . '</a></td>';
+                        // TODO: Meter startdaytype y enddatetype y resolver problema LANG 
+                        $tbody .= '<td>' . $startdate . '</td>';
+                        $tbody .= '<td>' . $enddate . '</td>';
+                        $tbody .= '<td>' . $request['type'] . '</td>';
+                        $tbody .= '<td>' . $request['duration'] . '</td>';
+                        $tbody .= '</tr>';
+                    }
+                    $tbody .= '</tbody>';
+                    $tbody .= '</table>';
+                    $tbody .= '</td></tr>';
+                } else {
+                    $tbody .= '<tr><td colspan="' . count($row) . '">----</td></tr>';
+                }
+            }
+            $line++;
+        }
+        $table = '<table class="table table-bordered table-hover">' .
+            '<thead>' .
+            '<tr>' .
+            $thead .
+            '</tr>' .
+            '</thead>' .
+            '<tbody>' .
+            $tbody .
+            '</tbody>' .
+            '</table>';
+        $this->output->set_output($table);
+    }
+
+    /**
+     * Export the leaves report into Excel
+     * @author Benjamin BALET <benjamin.balet@gmail.com>
+     * @since 0.4.3
+     */
+    public function exportLeavesReportBetweenDates()
+    {
+        $this->auth->checkIfOperationIsAllowed('native_report_leaves');
+        $this->lang->load('leaves', $this->language);
+        $this->load->model('organization_model');
+        $this->load->model('leaves_model');
+        $this->load->model('types_model');
+        $this->load->model('dayoffs_model');
+        $data['refDate'] = date("Y-m-d");
+        if (isset($_GET['refDate']) && $_GET['refDate'] != NULL) {
+            $data['refDate'] = date("Y-m-d", $_GET['refDate']);
+        }
+        $data['include_children'] = filter_var($_GET['children'], FILTER_VALIDATE_BOOLEAN);
+        $this->load->view('reports/leaves/export', $data);
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-$GLOBALS['debug'] = TRUE;
+$GLOBALS['debug'] = FALSE;
 
 $this->lang->load('requests', $this->language);
 $this->lang->load('global', $this->language);
@@ -9,8 +9,9 @@ $this->lang->load('global', $this->language);
 
 $this->load->model('organization_model');
 
-function getLeaveTypes($ci) {
-$sql = <<<EOF
+/*function getLeaveTypes($ci)
+{
+    $sql = <<<EOF
 -- 
 -- The list of leave types
 
@@ -24,14 +25,15 @@ EOF;
 
     $rows = $query->result_array();
     $ids = array();
-    foreach($rows as $row) {
+    foreach ($rows as $row) {
         $ids[$row["id"]] = $row["name"];
     }
     return $ids;
 }
 
 
-function getUserIdsWithLeavesBetweenDates($ci, $startdate, $enddate) {
+function getUserIdsWithLeavesBetweenDates($startdate, $enddate)
+{
 
     $sql = <<<EOF
 -- 
@@ -66,22 +68,23 @@ where
 order by users.id
 EOF;
 
-    $query = $ci->db->query($sql);
+    $query = $this>db->query($sql);
 
     $rows = $query->result_array();
     $ids = array();
-    foreach($rows as $row) {
+    foreach ($rows as $row) {
         $ids[] = $row["id"];
     }
     return $ids;
 }
 
 
-function getLeavesBetweenDates($ci, $startdate, $enddate) {
+function getLeavesBetweenDates($ci, $startdate, $enddate)
+{
 
     $tablename = str_replace("-", "_", "leavestable_${startdate}_${enddate}");
 
-    
+
     $createtemptable = <<<EOF
 create or replace temporary table $tablename
 -- 
@@ -265,7 +268,7 @@ EOF3;
        ,0)) as '$type'
 EOF4;
     }
-    
+
 
     $query .= $queryend;
     if ($GLOBALS['debug']) {
@@ -282,8 +285,8 @@ EOF4;
     $queryresult = $ci->db->query($query);
     $queryresult2 = $ci->db->query("select * from $tablename");
     if ($GLOBALS['debug']) {
-        echo "error:".print_r($ci->db->error());
-         echo "<br/>";
+        echo "error:" . print_r($ci->db->error());
+        echo "<br/>";
     }
     $rows2 = $queryresult2->result_array();
     $rows = $queryresult->result_array();
@@ -291,249 +294,246 @@ EOF4;
 
     return $rows;
 }
+*/
+
 
 
 ?>
-<h2><?php echo lang('Leave Management System');?></h2>
+<h2><?php echo lang('Leave Management System'); ?></h2>
 
-<h2><?php echo lang('reports_leaves_title');?></h2>
+<h2><?php echo lang('reports_leaves_title'); ?></h2>
 
 <div class="row-fluid">
     <div class="span4">
-        <label for="viz_startdate"><?php echo lang('leaves_create_field_start');?>
-            <input type="text" name="viz_startdate" id="startdate" />
+
+        <label for="startdate"><?php echo lang('leaves_create_field_start'); ?>
+            <input type="text" name="startdate" id="startdate" />
         </label>
-        <label for="viz_enddate"><?php echo lang('leaves_create_field_end');?>
-            <input type="text" name="viz_enddate" id="enddate" />
+        <label for="enddate"><?php echo lang('leaves_create_field_end'); ?>
+            <input type="text" name="enddate" id="enddate" />
         </label>
-        <label for="cboMonth"><?php echo lang('reports_leaves_month_field');?>
-            <select name="cboMonth" id="cboMonth">
-                <?php for ($ii=1; $ii<13;$ii++) {
-                    if ($ii == date('m')) {
-                        echo "<option val='" . $ii ."' selected>" . $ii ."</option>";
-                    } else {
-                        echo "<option val='" . $ii ."'>" . $ii ."</option>";
-                    }
-                }?>
-                <!--<option val='0'><?php echo lang('All');?></option>//-->
-            </select>
-        </label>
-        <label for="cboYear"><?php echo lang('reports_leaves_year_field');?>
-            <select name="cboYear" id="cboYear">
-                <?php $len =  date('Y');
-                for ($ii=date('Y', strtotime('-6 year')); $ii<= $len; $ii++) {
-                    if ($ii == date('Y')) {
-                        echo "<option val='" . $ii ."' selected>" . $ii ."</option>";
-                    } else {
-                        echo "<option val='" . $ii ."'>" . $ii ."</option>";
-                    }
-                }?>
-            </select>
-        </label>
+
+        <div class="alert hide alert-error" id="lblHourlyRequestBeyondLimitsAlert" onclick="$('#lblHourlyRequestBeyondLimitsAlert').hide();">
+            <button type="button" class="close">&times;</button>
+            <?php echo lang('leaves_flash_msg_hourly_reports_beyond_limits'); ?>
+        </div>
+
         <br />
     </div>
     <div class="span4">
-        <label for="txtEntity"><?php echo lang('reports_leaves_field_entity');?></label>
+        <label for="txtEntity"><?php echo lang('reports_leaves_field_entity'); ?></label>
         <div class="input-append">
-        <input type="text" id="txtEntity" name="txtEntity" readonly />
-        <button id="cmdSelectEntity" class="btn btn-primary"><?php echo lang('reports_leaves_button_entity');?></button>
+            <input type="text" id="txtEntity" name="txtEntity" readonly />
+            <button id="cmdSelectEntity" class="btn btn-primary"><?php echo lang('reports_leaves_button_entity'); ?></button>
         </div>
         <label for="chkIncludeChildren">
-                <input type="checkbox" id="chkIncludeChildren" name="chkIncludeChildren" checked /> <?php echo lang('reports_leaves_field_subdepts');?>
+            <input type="checkbox" id="chkIncludeChildren" name="chkIncludeChildren" checked /> <?php echo lang('reports_leaves_field_subdepts'); ?>
         </label>
     </div>
     <div class="span4">
         <div class="pull-right">
             <label for="chkLeaveDetails">
-                    <input type="checkbox" id="chkLeaveDetails" name="chkLeaveDetails" /> <?php echo lang('reports_leaves_field_leave_requests');?>
+                <input type="checkbox" id="chkLeaveDetails" name="chkLeaveDetails" /> <?php echo lang('reports_leaves_field_leave_requests'); ?>
             </label>
             &nbsp;
-            <button class="btn btn-primary" id="cmdLaunchReport"><i class="mdi mdi-file-chart"></i>&nbsp; <?php echo lang('reports_leaves_button_launch');?></button>
-            <button class="btn btn-primary" id="cmdExportReport"><i class="mdi mdi-download"></i>&nbsp; <?php echo lang('reports_leaves_button_export');?></button>
+            <button class="btn btn-primary" id="cmdLaunchReport"><i class="mdi mdi-file-chart"></i>&nbsp; <?php echo lang('reports_leaves_button_launch'); ?></button>
+            <button class="btn btn-primary" id="cmdExportReport"><i class="mdi mdi-download"></i>&nbsp; <?php echo lang('reports_leaves_button_export'); ?></button>
         </div>
     </div>
 </div>
 
-<div class="row-fluid"><div class="span12">&nbsp;</div></div>
+<div class="row-fluid">
+    <div class="span12">&nbsp;</div>
+</div>
 
 <div id="reportResult"></div>
 
-<div class="row-fluid"><div class="span12">&nbsp;</div></div>
+<div class="row-fluid">
+    <div class="span12">&nbsp;</div>
+</div>
 
 <div id="frmSelectEntity" class="modal hide fade">
     <div class="modal-header">
         <a href="#" onclick="$('#frmSelectEntity').modal('hide');" class="close">&times;</a>
-         <h3><?php echo lang('reports_leaves_popup_entity_title');?></h3>
+        <h3><?php echo lang('reports_leaves_popup_entity_title'); ?></h3>
     </div>
     <div class="modal-body" id="frmSelectEntityBody">
-        <img src="<?php echo base_url();?>assets/images/loading.gif">
+        <img src="<?php echo base_url(); ?>assets/images/loading.gif">
     </div>
     <div class="modal-footer">
-        <a href="#" onclick="select_entity();" class="btn"><?php echo lang('reports_leaves_popup_entity_button_ok');?></a>
-        <a href="#" onclick="$('#frmSelectEntity').modal('hide');" class="btn"><?php echo lang('reports_leaves_popup_entity_button_cancel');?></a>
+        <a href="#" onclick="select_entity();" class="btn"><?php echo lang('reports_leaves_popup_entity_button_ok'); ?></a>
+        <a href="#" onclick="$('#frmSelectEntity').modal('hide');" class="btn"><?php echo lang('reports_leaves_popup_entity_button_cancel'); ?></a>
     </div>
 </div>
 
 
 <div id="mytest2">
-<table>
-<?php 
-$startdate="2019-04-01";
-$enddate="2019-04-30";
-$userids = getUserIdsWithLeavesBetweenDates($this, $startdate, $enddate);
-$leaves = getLeavesBetweenDates($this, $startdate, $enddate);
-//echo print_r($leaves);
+    <table>
+        <?php
 
-foreach ($leaves as $row ) {
-// TODO table header
-?>
-<tr>
-<?php foreach ($row as $key => $value) {
-?>
-<td><?= $key ?> = <?= $value ?></td>
-<?php } ?>
+        //if(isset($_POST['cmdLaunchReport'])){
+        //$startdate = '2019-05-07';
+        //$enddate= '2019-05-09';
+        //}
+        //$userids = getUserIdsWithLeavesBetweenDates($this, $startdate, $enddate);
+        //$leaves = getLeavesBetweenDates($this, $startdate, $enddate);
+        //echo print_r($leaves);
 
-</tr>
-<?php } ?>
-</table>
+        //foreach ($leaves as $row ) {
+        // TODO table header
+        ?>
+        <tr>
+            <?php //foreach ($row as $key => $value) {
+            ?>
+
+    </table>
 
 </div>
 
 
 
-<link rel="stylesheet" href="<?php echo base_url();?>assets/css/flick/jquery-ui.custom.min.css">
-<script src="<?php echo base_url();?>assets/js/jquery-ui.custom.min.js"></script>
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/flick/jquery-ui.custom.min.css">
+<script src="<?php echo base_url(); ?>assets/js/jquery-ui.custom.min.js"></script>
 <?php //Prevent HTTP-404 when localization isn't needed
 if ($language_code != 'en') { ?>
-<script src="<?php echo base_url();?>assets/js/i18n/jquery.ui.datepicker-<?php echo $language_code;?>.js"></script>
+    <script src="<?php echo base_url(); ?>assets/js/i18n/jquery.ui.datepicker-<?php echo $language_code; ?>.js"></script>
 <?php } ?>
-<script type="text/javascript" src="<?php echo base_url();?>assets/js/moment-with-locales.min.js" type="text/javascript"></script>
-<script type="text/javascript" src="<?php echo base_url();?>assets/js/js.state-2.2.0.min.js"></script>
+<script src="<?php echo base_url();?>assets/js/bootbox.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url(); ?>assets/js/moment-with-locales.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="<?php echo base_url(); ?>assets/js/js.state-2.2.0.min.js"></script>
 <script type="text/javascript">
+    var entity = -1; //Id of the selected entity
+    var entityName = ''; //Label of the selected entity
+    var includeChildren = true;
+    var leaveDetails = false;
 
-var entity = -1; //Id of the selected entity
-var entityName = ''; //Label of the selected entity
-var includeChildren = true;
-var leaveDetails = false;
-var month = <?php echo date('m');?>;
-var year = <?php echo date('Y');?>;
-
-function select_entity() {
-    entity = $('#organization').jstree('get_selected')[0];
-    entityName = $('#organization').jstree().get_text(entity);
-    $('#txtEntity').val(entityName);
-    $("#frmSelectEntity").modal('hide');
-    Cookies.set('rep_entity', entity);
-    Cookies.set('rep_entityName', entityName);
-    Cookies.set('rep_includeChildren', includeChildren);
-}
-
-$(document).ready(function() {
-    //Init datepicker widget
-    moment.locale('<?php echo $language_code;?>');
-    $("#refdate").val(moment().format('L'));
-    $('#refdate').datepicker();
-    $('#startdate').datepicker();
-    $('#enddate').datepicker();
-
-    $("#frmSelectEntity").alert();
-
-    $("#cmdSelectEntity").click(function() {
-        $("#frmSelectEntity").modal('show');
-        $("#frmSelectEntityBody").load('<?php echo base_url(); ?>organization/select');
-    });
-
-    $("#cboMonth").click(function() {
-        month = $("#cboMonth").val();
-    });
-
-    $("#cboYear").click(function() {
-        year = $("#cboYear").val();
-    });
-
-    $('#cmdExportReport').click(function() {
-        var rtpQuery = '<?php echo base_url();?>reports/leaves/export';
-        var tmpUnix = moment($("#refdate").datepicker("getDate")).utc().unix();
-        if (entity != -1) {
-            rtpQuery += '?entity=' + entity;
-        } else {
-            rtpQuery += '?entity=0';
-        }
-        rtpQuery += '&month=' + month;
-        rtpQuery += '&year=' + year;
-        if ($('#chkIncludeChildren').prop('checked') == true) {
-            rtpQuery += '&children=true';
-        } else {
-            rtpQuery += '&children=false';
-        }
-        if ($('#chkLeaveDetails').prop('checked') == true) {
-            rtpQuery += '&requests=true';
-        } else {
-            rtpQuery += '&requests=false';
-        }
-        document.location.href = rtpQuery;
-    });
-
-    $('#cmdLaunchReport').click(function() {
-        var ajaxQuery = '<?php echo base_url();?>reports/leaves/execute';
-        var tmpUnix = moment($("#refdate").datepicker("getDate")).utc().unix();
-        if (entity != -1) {
-            ajaxQuery += '?entity=' + entity;
-        } else {
-            ajaxQuery += '?entity=0';
-        }
-        ajaxQuery += '&month=' + month;
-        ajaxQuery += '&year=' + year;
-        if ($('#chkIncludeChildren').prop('checked') == true) {
-            ajaxQuery += '&children=true';
-        } else {
-            ajaxQuery += '&children=false';
-        }
-        if ($('#chkLeaveDetails').prop('checked') == true) {
-            ajaxQuery += '&requests=true';
-        } else {
-            ajaxQuery += '&requests=false';
-        }
-        $('#reportResult').html("<img src='<?php echo base_url();?>assets/images/loading.gif' />");
-
-        $.ajax({
-          url: ajaxQuery
-        })
-        .done(function( data ) {
-              $('#reportResult').html(data);
-        });
-
-    });
-
-    //Toggle include sub-entities option
-    $('#chkIncludeChildren').on('change', function() {
-        includeChildren = $('#chkIncludeChildren').prop('checked');
-        Cookies.set('rep_includeChildren', includeChildren);
-    });
-
-    //Toggle include leave requests
-    $('#chkLeaveDetails').on('change', function() {
-        leaveDetails = $('#chkLeaveDetails').prop('checked');
-        Cookies.set('rep_leaveDetails', leaveDetails);
-    });
-
-    //Cookie has value ? take -1 by default
-    if(Cookies.get('rep_entity') !== undefined) {
-        entity = Cookies.get('rep_entity');
-        entityName = Cookies.get('rep_entityName');
-        includeChildren = Cookies.get('rep_includeChildren');
-        leaveDetails = (Cookies.get('rep_leaveDetails') === undefined) ? "false" : Cookies.get('rep_leaveDetails');
-        //Parse boolean values
-        includeChildren = $.parseJSON(includeChildren.toLowerCase());
-        leaveDetails = $.parseJSON(leaveDetails.toLowerCase());
+    function select_entity() {
+        entity = $('#organization').jstree('get_selected')[0];
+        entityName = $('#organization').jstree().get_text(entity);
         $('#txtEntity').val(entityName);
-        $('#chkIncludeChildren').prop('checked', includeChildren);
-        $('#chkLeaveDetails').prop('checked', leaveDetails);
-    } else { //Set default value
+        $("#frmSelectEntity").modal('hide');
         Cookies.set('rep_entity', entity);
         Cookies.set('rep_entityName', entityName);
         Cookies.set('rep_includeChildren', includeChildren);
-        Cookies.set('rep_leaveDetails', leaveDetails);        
     }
-});
+
+    $(document).ready(function() {
+        //Init datepicker widget
+        moment.locale('<?php echo $language_code; ?>');
+
+        $('#startdate').datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+        $('#startdate').datepicker('setDate', new Date());
+        $('#enddate').datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+        $('#enddate').datepicker('setDate', 1);
+
+        $("#frmSelectEntity").alert();
+
+        $("#cmdSelectEntity").click(function() {
+            $("#frmSelectEntity").modal('show');
+            $("#frmSelectEntityBody").load('<?php echo base_url(); ?>organization/select');
+        });
+
+        $('#cmdExportReport').click(function() {
+            var rtpQuery = '<?php echo base_url(); ?>reports/leaves/export';
+            var startdate = $("#startdate").val();
+            var enddate = $("#enddate").val();
+            if (entity != -1) {
+                rtpQuery += '?entity=' + entity;
+            } else {
+                rtpQuery += '?entity=0';
+            }
+
+            rtpQuery += '&startdate=' + startdate;
+            rtpQuery += '&enddate=' + enddate;
+
+
+            if ($('#chkIncludeChildren').prop('checked') == true) {
+                rtpQuery += '&children=true';
+            } else {
+                rtpQuery += '&children=false';
+            }
+            if ($('#chkLeaveDetails').prop('checked') == true) {
+                rtpQuery += '&requests=true';
+            } else {
+                rtpQuery += '&requests=false';
+            }
+            document.location.href = rtpQuery;
+        });
+
+        $('#cmdLaunchReport').click(function() {
+            var ajaxQuery = '<?php echo base_url(); ?>reports/leaves/executeHours';
+            var startdate = $("#startdate").val();
+            var enddate = $("#enddate").val();
+            if (entity != -1) {
+                ajaxQuery += '?entity=' + entity;
+            } else {
+                ajaxQuery += '?entity=0';
+            }
+
+            if (startdate == 0 || enddate == 0) {
+                bootbox.alert("<?php echo lang('leaves_flash_msg_hourly_reports_days_report');?>");
+            }
+
+            ajaxQuery += '&startdate=' + startdate;
+            ajaxQuery += '&enddate=' + enddate;
+
+            if ($('#chkIncludeChildren').prop('checked') == true) {
+                ajaxQuery += '&children=true';
+            } else {
+                ajaxQuery += '&children=false';
+            }
+            if ($('#chkLeaveDetails').prop('checked') == true) {
+                ajaxQuery += '&requests=true';
+            } else {
+                ajaxQuery += '&requests=false';
+            }
+
+            if (startdate == "" || enddate == "") {
+                $('#reportResult').html("<img src='<?php echo base_url(); ?>assets/images/loading.gif' />");
+            }
+
+            $.ajax({
+                    url: ajaxQuery
+                })
+                .done(function(data) {
+                    $('#reportResult').html(data);
+                });
+
+        });
+
+        //Toggle include sub-entities option
+        $('#chkIncludeChildren').on('change', function() {
+            includeChildren = $('#chkIncludeChildren').prop('checked');
+            Cookies.set('rep_includeChildren', includeChildren);
+        });
+
+        //Toggle include leave requests
+        $('#chkLeaveDetails').on('change', function() {
+            leaveDetails = $('#chkLeaveDetails').prop('checked');
+            Cookies.set('rep_leaveDetails', leaveDetails);
+        });
+
+        //Cookie has value ? take -1 by default
+        if (Cookies.get('rep_entity') !== undefined) {
+            entity = Cookies.get('rep_entity');
+            entityName = Cookies.get('rep_entityName');
+            includeChildren = Cookies.get('rep_includeChildren');
+            leaveDetails = (Cookies.get('rep_leaveDetails') === undefined) ? "false" : Cookies.get('rep_leaveDetails');
+            //Parse boolean values
+            includeChildren = $.parseJSON(includeChildren.toLowerCase());
+            leaveDetails = $.parseJSON(leaveDetails.toLowerCase());
+            $('#txtEntity').val(entityName);
+            $('#chkIncludeChildren').prop('checked', includeChildren);
+            $('#chkLeaveDetails').prop('checked', leaveDetails);
+        } else { //Set default value
+            Cookies.set('rep_entity', entity);
+            Cookies.set('rep_entityName', entityName);
+            Cookies.set('rep_includeChildren', includeChildren);
+            Cookies.set('rep_leaveDetails', leaveDetails);
+        }
+    });
 </script>
