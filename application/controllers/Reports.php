@@ -542,45 +542,45 @@ class Reports extends CI_Controller
 
                 $index++;
             }
-            $tbody .= '</tr>';
-            //Display a nested table listing the leave requests
-            if ($requests) {
-                if (count($leave_requests[$user_id])) {
-                    $tbody .= '<tr><td colspan="' . count($row) . '">';
-                    $tbody .= '<table class="table table-bordered table-hover" style="width: auto !important;">';
-                    $tbody .= '<thead><tr>';
-                    $tbody .= '<th>' . lang('leaves_index_thead_id') . '</th>';
-                    $tbody .= '<th>' . lang('leaves_index_thead_start_date') . '</th>';
-                    $tbody .= '<th>' . lang('leaves_index_thead_end_date') . '</th>';
-                    $tbody .= '<th>' . lang('leaves_index_thead_type') . '</th>';
-                    $tbody .= '<th>' . lang('leaves_index_thead_duration') . '</th>';
-                    $tbody .= '</tr></thead>';
-                    $tbody .= '<tbody>';
-                    //Iterate on leave requests
-                    //var_dump($leave_requests[$user_id]);
-                    foreach ($leave_requests[$user_id] as $request) {
-                        //var_dump($request);
-                        $date = new DateTime($request['startdate']);
-                        $startdate = $date->format(lang('global_date_format'));
-                        $date = new DateTime($request['enddate']);
-                        $enddate = $date->format(lang('global_date_format'));
-                        $tbody .= '<tr>';
-                        $tbody .= '<td><a href="' . base_url() . 'leaves/view/' . $request['id'] . '" target="_blank">' . $request['id'] . '</a></td>';
-                        // TODO: Meter startdaytype y enddatetype y resolver problema LANG 
-                        $tbody .= '<td>' . $startdate . '</td>';
-                        $tbody .= '<td>' . $enddate . '</td>';
-                        $tbody .= '<td>' . $request['type'] . '</td>';
-                        $tbody .= '<td>' . $request['duration'] . '</td>';
-                        $tbody .= '</tr>';
-                    }
-                    $tbody .= '</tbody>';
-                    $tbody .= '</table>';
-                    $tbody .= '</td></tr>';
-                } else {
-                    $tbody .= '<tr><td colspan="' . count($row) . '">----</td></tr>';
-                }
-            }
-            $line++;
+            // $tbody .= '</tr>';
+            // //Display a nested table listing the leave requests
+            // if ($requests) {
+            //     if (count($leave_requests[$user_id])) {
+            //         $tbody .= '<tr><td colspan="' . count($row) . '">';
+            //         $tbody .= '<table class="table table-bordered table-hover" style="width: auto !important;">';
+            //         $tbody .= '<thead><tr>';
+            //         $tbody .= '<th>' . lang('leaves_index_thead_id') . '</th>';
+            //         $tbody .= '<th>' . lang('leaves_index_thead_start_date') . '</th>';
+            //         $tbody .= '<th>' . lang('leaves_index_thead_end_date') . '</th>';
+            //         $tbody .= '<th>' . lang('leaves_index_thead_type') . '</th>';
+            //         $tbody .= '<th>' . lang('leaves_index_thead_duration') . '</th>';
+            //         $tbody .= '</tr></thead>';
+            //         $tbody .= '<tbody>';
+            //         //Iterate on leave requests
+            //         //var_dump($leave_requests[$user_id]);
+            //         foreach ($leave_requests[$user_id] as $request) {
+            //             //var_dump($request);
+            //             $date = new DateTime($request['startdate']);
+            //             $startdate = $date->format(lang('global_date_format'));
+            //             $date = new DateTime($request['enddate']);
+            //             $enddate = $date->format(lang('global_date_format'));
+            //             $tbody .= '<tr>';
+            //             $tbody .= '<td><a href="' . base_url() . 'leaves/view/' . $request['id'] . '" target="_blank">' . $request['id'] . '</a></td>';
+            //             // TODO: Meter startdaytype y enddatetype y resolver problema LANG 
+            //             $tbody .= '<td>' . $startdate . '</td>';
+            //             $tbody .= '<td>' . $enddate . '</td>';
+            //             $tbody .= '<td>' . $request['type'] . '</td>';
+            //             $tbody .= '<td>' . $request['duration'] . '</td>';
+            //             $tbody .= '</tr>';
+            //         }
+            //         $tbody .= '</tbody>';
+            //         $tbody .= '</table>';
+            //         $tbody .= '</td></tr>';
+            //     } else {
+            //         $tbody .= '<tr><td colspan="' . count($row) . '">----</td></tr>';
+            //     }
+            // }
+            // $line++;
         }
         $table = '<table class="table table-bordered table-hover">' .
             '<thead>' .
