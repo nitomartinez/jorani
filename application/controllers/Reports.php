@@ -343,6 +343,7 @@ class Reports extends CI_Controller
                     $tbody .= '<tbody>';
                     //Iterate on leave requests
                     foreach ($leave_requests[$user_id] as $request) {
+                        //var_dump($request);
                         $date = new DateTime($request['startdate']);
                         $startdate = $date->format(lang('global_date_format'));
                         $date = new DateTime($request['enddate']);
@@ -412,17 +413,35 @@ class Reports extends CI_Controller
         $children = filter_var($this->input->get("children"), FILTER_VALIDATE_BOOLEAN);
         $requests = filter_var($this->input->get("requests"), FILTER_VALIDATE_BOOLEAN);
 
+        //echo $startdate . "\n";
+        //echo $enddate;
         //Compute facts about dates and the selected month
         if ($startdate == 0 || $enddate == 0) {
+            //$start = new DateTime('first day of January ' . date('Y'));
             $start = date('Y-01-01');
+            //var_dump($start);
+            //$end = new DateTime('last day of December ' . date('Y'));
             $end = date('Y-12-31');
+            //var_dump($end);
             $interval = abs(strtotime($end) - strtotime($start));
             $intervalDays = floor($interval / (60 * 60 * 24));
+
+            printf("%d days\n", $intervalDays);
+            // %a will output the total number of days.
+            //echo $interval->format('%a total days')."\n";
+
+            // While %d will only output the number of days not already covered by the
+            // month.
+            //echo $interval->format('%m month, %d days');
         } else {
             $start = $startdate;
+            //$lastDay = date("t", strtotime($start));    //$endDate + last day of selected month
             $end = $enddate;
+            //var_dump($start, $end);
             $interval = abs(strtotime($end) - strtotime($start));
             $intervalDays = ($interval / (60 * 60 * 24));
+            //var_dump($intervalDays);
+            //$total_days = cal_days_in_month(CAL_GREGORIAN, $month, $year);
         }
 
 
@@ -432,11 +451,28 @@ class Reports extends CI_Controller
         $this->load->model('dayoffs_model');
         $types = $this->types_model->getTypes();
 
+        //Iterate on all employees of the entity
+        //$users = $this->organization_model->allEmployees($entity, $children);
+        //$leaves = array();
+        //echo $this->leaves_model->getCosa();
         $leavesBetweenDates = $this->leaves_model->getLeavesBetweenDates($start, $end);
+        //$usersIds = $this->leaves_model->getUserIdsWithLeavesBetweenDates($start, $end);
+        //var_dump($leavesBetweenDates);
+        //var_dump($usersIds);
+
+        //$leaves = $this->leaves_model->getLeavesBetweenDatesNueva($start, $end);
+        //var_dump($rows);
         $result = array();
         $leave_requests = array();
-
+        
         foreach ($leavesBetweenDates as $leave) {
+
+            //var_dump($leave);
+           
+            // FIXME: PROBLEMA CON ID //
+           /* echo $result['id'] = $leave['id'];
+            echo $result['userid'] = $leave['userid'];*/
+
             $result[$leave['id']]['id'] = $leave['id'];
             $result[$leave['id']]['userid'] = $leave['userid'];
             $result[$leave['id']]['firstname'] = $leave['firstname'];
@@ -451,7 +487,27 @@ class Reports extends CI_Controller
             $result[$leave['id']]['daysoffoutsideofperiod'] = $leave['daysoffoutsideofperiod'];
             $result[$leave['id']]['halfdayadjustment'] = $leave['halfdayadjustment'];
             $result[$leave['id']]['effectiveduration'] = $leave['effectiveduration'];
+
+            //$linear = $this->leaves_model->linearBetweenDates($leave['id'], $start, $end, FALSE, FALSE, TRUE, FALSE);
+            //$leave_duration = $this->leaves_model->monthlyLeavesDuration($linear);
+            //$leaves_detail = $this->leaves_model->monthlyLeavesByType($linear);
             if ($requests) $leave_requests[$leave['id']] = $this->leaves_model->getLeavesBetweenDates($start, $end);
+            
+            //Init type columns
+            // foreach ($types as $type) {
+            //     if (array_key_exists($type['name'], $leaves_detail)) {
+            //         $result[$leave['id']][$type['name']] = $leaves_detail[$type['name']];
+            //     } else {
+            //         $result[$leave['id']][$type['name']] = '';
+            //     }
+            // }
+            
+            //var_dump($requests);
+            //}
+            /*echo $result[$user->id]['leave_duration'] = $leave_duration . "\n";
+            echo $result[$user->id]['intervalDays'] = $intervalDays . "\n";
+            echo $result[$user->id]['non_working_days'] = $non_working_days . "\n";
+            echo $result[$user->id]['work_duration'] = $work_duration . "\n";*/
         }
 
         $table = '';
@@ -459,25 +515,72 @@ class Reports extends CI_Controller
         $tbody = '';
         $line = 2;
         $i18 = array("id", "userid", "firstname", "lastname", "type", "leavetype", "leavestatus", "startdate", "enddate", "duration", "durationoutsideofperiod", "daysoffoutsideofperiod", "halfdayadjustment", "effectiveduration");
+        //var_dump($result);
+       
         foreach ($result as $user_id => $row) {
             $index = 1;
             $tbody .= '<tr>';
+            //var_dump($row);
             foreach ($row as $key => $value) {
+                //var_dump($value);
                 if ($line == 2) {
-                    if (in_array($key, $i18)) {
-                        $thead .= '<th>' . $key . '</th>';
-                    } else {
-                        $thead .= '<th>' . $key . '</th>';
-                    }
+                        if (in_array($key, $i18)) {
+                            //echo $key;
+                            $thead .= '<th>' . $key . '</th>';
+                        } else {
+                            $thead .= '<th>' . $key . '</th>';
+                        }
+                    
                 }
                 if ($key == 'id') {
                     $tbody .= '<td><a href="' . base_url() . 'leaves/view/' . $value . '" target="_blank">' . $value . '</a></td>';
                 } else {
                     $tbody .= '<td>' . $value . '</td>';
                 }
+                //var_dump($key);
+                //var_dump($value);
+
                 $index++;
             }
-            $line++;
+            // $tbody .= '</tr>';
+            // //Display a nested table listing the leave requests
+            // if ($requests) {
+            //     if (count($leave_requests[$user_id])) {
+            //         $tbody .= '<tr><td colspan="' . count($row) . '">';
+            //         $tbody .= '<table class="table table-bordered table-hover" style="width: auto !important;">';
+            //         $tbody .= '<thead><tr>';
+            //         $tbody .= '<th>' . lang('leaves_index_thead_id') . '</th>';
+            //         $tbody .= '<th>' . lang('leaves_index_thead_start_date') . '</th>';
+            //         $tbody .= '<th>' . lang('leaves_index_thead_end_date') . '</th>';
+            //         $tbody .= '<th>' . lang('leaves_index_thead_type') . '</th>';
+            //         $tbody .= '<th>' . lang('leaves_index_thead_duration') . '</th>';
+            //         $tbody .= '</tr></thead>';
+            //         $tbody .= '<tbody>';
+            //         //Iterate on leave requests
+            //         //var_dump($leave_requests[$user_id]);
+            //         foreach ($leave_requests[$user_id] as $request) {
+            //             //var_dump($request);
+            //             $date = new DateTime($request['startdate']);
+            //             $startdate = $date->format(lang('global_date_format'));
+            //             $date = new DateTime($request['enddate']);
+            //             $enddate = $date->format(lang('global_date_format'));
+            //             $tbody .= '<tr>';
+            //             $tbody .= '<td><a href="' . base_url() . 'leaves/view/' . $request['id'] . '" target="_blank">' . $request['id'] . '</a></td>';
+            //             // TODO: Meter startdaytype y enddatetype y resolver problema LANG 
+            //             $tbody .= '<td>' . $startdate . '</td>';
+            //             $tbody .= '<td>' . $enddate . '</td>';
+            //             $tbody .= '<td>' . $request['type'] . '</td>';
+            //             $tbody .= '<td>' . $request['duration'] . '</td>';
+            //             $tbody .= '</tr>';
+            //         }
+            //         $tbody .= '</tbody>';
+            //         $tbody .= '</table>';
+            //         $tbody .= '</td></tr>';
+            //     } else {
+            //         $tbody .= '<tr><td colspan="' . count($row) . '">----</td></tr>';
+            //     }
+            // }
+            // $line++;
         }
         $table = '<table class="table table-bordered table-hover">' .
             '<thead>' .

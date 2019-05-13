@@ -3,11 +3,9 @@
 $GLOBALS['debug'] = FALSE;
 
 $this->lang->load('requests', $this->language);
-$this->lang->load('leaves', $this->language);
 $this->lang->load('global', $this->language);
-$this->lang->load('reports', $this->language);
 
-require_once FCPATH . "vendor/autoload.php";
+//require_once FCPATH . "vendor/autoload.php";
 
 $this->load->model('organization_model');
 
@@ -367,6 +365,32 @@ EOF4;
         <a href="#" onclick="$('#frmSelectEntity').modal('hide');" class="btn"><?php echo lang('reports_leaves_popup_entity_button_cancel'); ?></a>
     </div>
 </div>
+
+
+<div id="mytest2">
+    <table>
+        <?php
+
+        //if(isset($_POST['cmdLaunchReport'])){
+        //$startdate = '2019-05-07';
+        //$enddate= '2019-05-09';
+        //}
+        //$userids = getUserIdsWithLeavesBetweenDates($this, $startdate, $enddate);
+        //$leaves = getLeavesBetweenDates($this, $startdate, $enddate);
+        //echo print_r($leaves);
+
+        //foreach ($leaves as $row ) {
+        // TODO table header
+        ?>
+        <tr>
+            <?php //foreach ($row as $key => $value) {
+            ?>
+
+    </table>
+
+</div>
+
+
 
 <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/flick/jquery-ui.custom.min.css">
 <script src="<?php echo base_url(); ?>assets/js/jquery-ui.custom.min.js"></script>
