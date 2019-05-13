@@ -97,7 +97,6 @@ var entityName = ''; //Label of the selected entity
 var includeChildren = true;
 var leaveDetails = false;
 var month = <?php echo date('m');?>;
-console.log('month: ' + month);
 var year = <?php echo date('Y');?>;
 
 function select_entity() {
