@@ -387,4 +387,118 @@ class Reports extends CI_Controller {
         $this->load->view('reports/leaves/export', $data);
     }
 
+    /**
+     * Report leaves request between two dates.
+     */
+    public function executeLeavesReportBetweenDates()
+    {
+        $this->auth->checkIfOperationIsAllowed('native_report_leaves');
+        $this->lang->load('leaves', $this->language);
+
+        $startdate = $this->input->get("startdate") === FALSE ? 0 : $this->input->get("startdate");
+        $enddate = $this->input->get("enddate") === FALSE ? 0 : $this->input->get("enddate");
+        $entity = $this->input->get("entity") === FALSE ? 0 : $this->input->get("entity");
+        $children = filter_var($this->input->get("children"), FILTER_VALIDATE_BOOLEAN);
+        $requests = filter_var($this->input->get("requests"), FILTER_VALIDATE_BOOLEAN);
+
+        //Compute facts about dates and the selected month
+        if ($startdate == 0 || $enddate == 0) {
+            $start = date('Y-01-01');
+            $end = date('Y-12-31');
+            $interval = abs(strtotime($end) - strtotime($start));
+            $intervalDays = floor($interval / (60 * 60 * 24));
+        } else {
+            $start = $startdate;
+            $end = $enddate;
+            $interval = abs(strtotime($end) - strtotime($start));
+            $intervalDays = ($interval / (60 * 60 * 24));
+        }
+
+
+        $this->load->model('organization_model');
+        $this->load->model('leaves_model');
+        $this->load->model('types_model');
+        $this->load->model('dayoffs_model');
+        $types = $this->types_model->getTypes();
+
+        $leavesBetweenDates = $this->leaves_model->getLeavesBetweenDates($start, $end);
+        $result = array();
+        $leave_requests = array();
+
+        foreach ($leavesBetweenDates as $leave) {
+            $result[$leave['id']]['id'] = $leave['id'];
+            $result[$leave['id']]['userid'] = $leave['userid'];
+            $result[$leave['id']]['firstname'] = $leave['firstname'];
+            $result[$leave['id']]['lastname'] = $leave['lastname'];
+            $result[$leave['id']]['type'] = $leave['type'];
+            $result[$leave['id']]['leavetype'] = $leave['leavetype'];
+            $result[$leave['id']]['leavestatus '] = $leave['leavestatus'];
+            $result[$leave['id']]['startdate'] = $leave['startdate'];
+            $result[$leave['id']]['enddate'] = $leave['enddate'];
+            $result[$leave['id']]['duration'] = $leave['duration'];
+            $result[$leave['id']]['durationoutsideofperiod'] = $leave['durationoutsideofperiod'];
+            $result[$leave['id']]['daysoffoutsideofperiod'] = $leave['daysoffoutsideofperiod'];
+            $result[$leave['id']]['halfdayadjustment'] = $leave['halfdayadjustment'];
+            $result[$leave['id']]['effectiveduration'] = $leave['effectiveduration'];
+            if ($requests) $leave_requests[$leave['id']] = $this->leaves_model->getLeavesBetweenDates($start, $end);
+        }
+
+        $table = '';
+        $thead = '';
+        $tbody = '';
+        $line = 2;
+        $i18 = array("id", "userid", "firstname", "lastname", "type", "leavetype", "leavestatus", "startdate", "enddate", "duration", "durationoutsideofperiod", "daysoffoutsideofperiod", "halfdayadjustment", "effectiveduration");
+        foreach ($result as $user_id => $row) {
+            $index = 1;
+            $tbody .= '<tr>';
+            foreach ($row as $key => $value) {
+                if ($line == 2) {
+                    if (in_array($key, $i18)) {
+                        $thead .= '<th>' . $key . '</th>';
+                    } else {
+                        $thead .= '<th>' . $key . '</th>';
+                    }
+                }
+                if ($key == 'id') {
+                    $tbody .= '<td><a href="' . base_url() . 'leaves/view/' . $value . '" target="_blank">' . $value . '</a></td>';
+                } else {
+                    $tbody .= '<td>' . $value . '</td>';
+                }
+                $index++;
+            }
+            $line++;
+        }
+        $table = '<table class="table table-bordered table-hover">' .
+            '<thead>' .
+            '<tr>' .
+            $thead .
+            '</tr>' .
+            '</thead>' .
+            '<tbody>' .
+            $tbody .
+            '</tbody>' .
+            '</table>';
+        $this->output->set_output($table);
+    }
+
+    /**
+     * Export the leaves report into Excel
+     * @author Benjamin BALET <benjamin.balet@gmail.com>
+     * @since 0.4.3
+     */
+    public function exportLeavesReportBetweenDates()
+    {
+        $this->auth->checkIfOperationIsAllowed('native_report_leaves');
+        $this->lang->load('leaves', $this->language);
+        $this->load->model('organization_model');
+        $this->load->model('leaves_model');
+        $this->load->model('types_model');
+        $this->load->model('dayoffs_model');
+        $data['refDate'] = date("Y-m-d");
+        if (isset($_GET['refDate']) && $_GET['refDate'] != NULL) {
+            $data['refDate'] = date("Y-m-d", $_GET['refDate']);
+        }
+        $data['include_children'] = filter_var($_GET['children'], FILTER_VALIDATE_BOOLEAN);
+        $this->load->view('reports/leaves/export', $data);
+    }
 }
