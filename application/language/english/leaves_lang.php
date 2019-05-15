@@ -72,6 +72,7 @@ $lang['leaves_create_flash_msg_error'] = 'The leave request has been successfull
 $lang['leaves_flash_spn_list_days_off'] = '%s non-working days in the period';
 $lang['leaves_flash_msg_overlap_dayoff'] = 'Your leave request matches with a non-working day.';
 $lang['leaves_flash_msg_hourly_reports_beyond_limits'] = 'Your hourly leave request can only be used on the same day and not more than 8 hours';
+$lang['leaves_flash_msg_hourly_reports_days_report'] = 'Please, fill both dates';
 
 $lang['leaves_edit_html_title'] = 'Edit a leave request';
 $lang['leaves_edit_title'] = 'Edit leave request #';

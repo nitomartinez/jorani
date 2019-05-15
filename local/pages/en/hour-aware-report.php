@@ -1,11 +1,14 @@
 <?php
 
-$GLOBALS['debug'] = TRUE;
+$GLOBALS['debug'] = FALSE;
 
 $this->lang->load('requests', $this->language);
 $this->lang->load('global', $this->language);
+$this->lang->load('leaves', $this->language);
+$this->lang->load('reports', $this->language);
 
-//require_once FCPATH . "vendor/autoload.php";
+
+require_once FCPATH . "vendor/autoload.php";
 
 $this->load->model('organization_model');
 
@@ -294,45 +297,17 @@ EOF4;
 
 
 ?>
-<h2><?php echo lang('Leave Management System');?></h2>
 
 <h2><?php echo lang('reports_leaves_title');?></h2>
 
 <div class="row-fluid">
-    <div class="span4">
-        <label for="viz_startdate"><?php echo lang('leaves_create_field_start');?>
-            <input type="text" name="viz_startdate" id="startdate" />
-        </label>
-        <label for="viz_enddate"><?php echo lang('leaves_create_field_end');?>
-            <input type="text" name="viz_enddate" id="enddate" />
-        </label>
-        <label for="cboMonth"><?php echo lang('reports_leaves_month_field');?>
-            <select name="cboMonth" id="cboMonth">
-                <?php for ($ii=1; $ii<13;$ii++) {
-                    if ($ii == date('m')) {
-                        echo "<option val='" . $ii ."' selected>" . $ii ."</option>";
-                    } else {
-                        echo "<option val='" . $ii ."'>" . $ii ."</option>";
-                    }
-                }?>
-                <!--<option val='0'><?php echo lang('All');?></option>//-->
-            </select>
-        </label>
-        <label for="cboYear"><?php echo lang('reports_leaves_year_field');?>
-            <select name="cboYear" id="cboYear">
-                <?php $len =  date('Y');
-                for ($ii=date('Y', strtotime('-6 year')); $ii<= $len; $ii++) {
-                    if ($ii == date('Y')) {
-                        echo "<option val='" . $ii ."' selected>" . $ii ."</option>";
-                    } else {
-                        echo "<option val='" . $ii ."'>" . $ii ."</option>";
-                    }
-                }?>
-            </select>
-        </label>
-        <br />
+    <div class="span2">
+            <input type="text" name="startdate" id="startdate" />
     </div>
-    <div class="span4">
+    <div class="span3">
+            <input type="text" name="enddate" id="enddate" />
+    </div>
+    <div class="span3">
         <label for="txtEntity"><?php echo lang('reports_leaves_field_entity');?></label>
         <div class="input-append">
         <input type="text" id="txtEntity" name="txtEntity" readonly />
@@ -342,11 +317,8 @@ EOF4;
                 <input type="checkbox" id="chkIncludeChildren" name="chkIncludeChildren" checked /> <?php echo lang('reports_leaves_field_subdepts');?>
         </label>
     </div>
-    <div class="span4">
+    <div class="span3">
         <div class="pull-right">
-            <label for="chkLeaveDetails">
-                    <input type="checkbox" id="chkLeaveDetails" name="chkLeaveDetails" /> <?php echo lang('reports_leaves_field_leave_requests');?>
-            </label>
             &nbsp;
             <button class="btn btn-primary" id="cmdLaunchReport"><i class="mdi mdi-file-chart"></i>&nbsp; <?php echo lang('reports_leaves_button_launch');?></button>
             <button class="btn btn-primary" id="cmdExportReport"><i class="mdi mdi-download"></i>&nbsp; <?php echo lang('reports_leaves_button_export');?></button>
@@ -374,39 +346,13 @@ EOF4;
     </div>
 </div>
 
-
-<div id="mytest2">
-<table>
-<?php 
-$startdate="2019-04-01";
-$enddate="2019-04-30";
-$userids = getUserIdsWithLeavesBetweenDates($this, $startdate, $enddate);
-$leaves = getLeavesBetweenDates($this, $startdate, $enddate);
-//echo print_r($leaves);
-
-foreach ($leaves as $row ) {
-// TODO table header
-?>
-<tr>
-<?php foreach ($row as $key => $value) {
-?>
-<td><?= $key ?> = <?= $value ?></td>
-<?php } ?>
-
-</tr>
-<?php } ?>
-</table>
-
-</div>
-
-
-
 <link rel="stylesheet" href="<?php echo base_url();?>assets/css/flick/jquery-ui.custom.min.css">
 <script src="<?php echo base_url();?>assets/js/jquery-ui.custom.min.js"></script>
 <?php //Prevent HTTP-404 when localization isn't needed
 if ($language_code != 'en') { ?>
 <script src="<?php echo base_url();?>assets/js/i18n/jquery.ui.datepicker-<?php echo $language_code;?>.js"></script>
 <?php } ?>
+<script src="<?php echo base_url();?>assets/js/bootbox.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url();?>assets/js/moment-with-locales.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="<?php echo base_url();?>assets/js/js.state-2.2.0.min.js"></script>
 <script type="text/javascript">
@@ -415,8 +361,6 @@ var entity = -1; //Id of the selected entity
 var entityName = ''; //Label of the selected entity
 var includeChildren = true;
 var leaveDetails = false;
-var month = <?php echo date('m');?>;
-var year = <?php echo date('Y');?>;
 
 function select_entity() {
     entity = $('#organization').jstree('get_selected')[0];
@@ -431,10 +375,6 @@ function select_entity() {
 $(document).ready(function() {
     //Init datepicker widget
     moment.locale('<?php echo $language_code;?>');
-    $("#refdate").val(moment().format('L'));
-    $('#refdate').datepicker();
-    $('#startdate').datepicker();
-    $('#enddate').datepicker();
 
     $("#frmSelectEntity").alert();
 
@@ -443,13 +383,15 @@ $(document).ready(function() {
         $("#frmSelectEntityBody").load('<?php echo base_url(); ?>organization/select');
     });
 
-    $("#cboMonth").click(function() {
-        month = $("#cboMonth").val();
-    });
+    $('#startdate').datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+    $('#startdate').datepicker('setDate', new Date());
 
-    $("#cboYear").click(function() {
-        year = $("#cboYear").val();
-    });
+    $('#enddate').datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+    $('#enddate').datepicker('setDate', 1);
 
     $('#cmdExportReport').click(function() {
         var rtpQuery = '<?php echo base_url();?>reports/leaves/export';
@@ -459,8 +401,8 @@ $(document).ready(function() {
         } else {
             rtpQuery += '?entity=0';
         }
-        rtpQuery += '&month=' + month;
-        rtpQuery += '&year=' + year;
+        rtpQuery += '&startdate=' + startdate;
+        rtpQuery += '&enddate=' + enddate;
         if ($('#chkIncludeChildren').prop('checked') == true) {
             rtpQuery += '&children=true';
         } else {
@@ -477,13 +419,18 @@ $(document).ready(function() {
     $('#cmdLaunchReport').click(function() {
         var ajaxQuery = '<?php echo base_url();?>reports/leaves/execute';
         var tmpUnix = moment($("#refdate").datepicker("getDate")).utc().unix();
+        var startdate = $("#startdate").val();
+        var enddate = $("#enddate").val();
         if (entity != -1) {
             ajaxQuery += '?entity=' + entity;
         } else {
             ajaxQuery += '?entity=0';
         }
-        ajaxQuery += '&month=' + month;
-        ajaxQuery += '&year=' + year;
+
+        if (startdate == 0 || enddate == 0) {
+                bootbox.alert("<?php echo lang('leaves_flash_msg_hourly_reports_days_report');?>");
+        }
+
         if ($('#chkIncludeChildren').prop('checked') == true) {
             ajaxQuery += '&children=true';
         } else {
