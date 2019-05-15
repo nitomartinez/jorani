@@ -292,7 +292,7 @@ EOF4;
     $rows = $queryresult->result_array();
     $dropoutput = $ci->db->query($droptemptable);
 
-    return $rows;
+    return $rows2;
 }
 
 
@@ -394,7 +394,7 @@ $(document).ready(function() {
     $('#enddate').datepicker('setDate', 1);
 
     $('#cmdExportReport').click(function() {
-        var rtpQuery = '<?php echo base_url();?>reports/leaves/export';
+        var rtpQuery = '<?php echo base_url();?>reports/leaves/exportDates';
         var tmpUnix = moment($("#refdate").datepicker("getDate")).utc().unix();
         if (entity != -1) {
             rtpQuery += '?entity=' + entity;
@@ -417,7 +417,7 @@ $(document).ready(function() {
     });
 
     $('#cmdLaunchReport').click(function() {
-        var ajaxQuery = '<?php echo base_url();?>reports/leaves/execute';
+        var ajaxQuery = '<?php echo base_url();?>reports/leaves/executeDates';
         var tmpUnix = moment($("#refdate").datepicker("getDate")).utc().unix();
         var startdate = $("#startdate").val();
         var enddate = $("#enddate").val();
@@ -430,6 +430,9 @@ $(document).ready(function() {
         if (startdate == 0 || enddate == 0) {
                 bootbox.alert("<?php echo lang('leaves_flash_msg_hourly_reports_days_report');?>");
         }
+
+        ajaxQuery += '&startdate=' + startdate;
+        ajaxQuery += '&enddate=' + enddate;
 
         if ($('#chkIncludeChildren').prop('checked') == true) {
             ajaxQuery += '&children=true';

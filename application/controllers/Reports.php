@@ -392,9 +392,12 @@ class Reports extends CI_Controller {
      */
     public function executeLeavesReportBetweenDates()
     {
+        ob_start();
+        require 'C:\xampp\htdocs\joraniHours\jorani\local\pages\en\hour-aware-report.php';
+        ob_end_clean();
+        
         $this->auth->checkIfOperationIsAllowed('native_report_leaves');
         $this->lang->load('leaves', $this->language);
-
         $startdate = $this->input->get("startdate") === FALSE ? 0 : $this->input->get("startdate");
         $enddate = $this->input->get("enddate") === FALSE ? 0 : $this->input->get("enddate");
         $entity = $this->input->get("entity") === FALSE ? 0 : $this->input->get("entity");
@@ -420,34 +423,28 @@ class Reports extends CI_Controller {
         $this->load->model('types_model');
         $this->load->model('dayoffs_model');
         $types = $this->types_model->getTypes();
+        
 
-        $leavesBetweenDates = $this->leaves_model->getLeavesBetweenDates($start, $end);
+        $leavesBetweenDates = getLeavesBetweenDates($this, $startdate, $enddate);
+
         $result = array();
         $leave_requests = array();
 
         foreach ($leavesBetweenDates as $leave) {
-            $result[$leave['id']]['id'] = $leave['id'];
-            $result[$leave['id']]['userid'] = $leave['userid'];
-            $result[$leave['id']]['firstname'] = $leave['firstname'];
-            $result[$leave['id']]['lastname'] = $leave['lastname'];
-            $result[$leave['id']]['type'] = $leave['type'];
-            $result[$leave['id']]['leavetype'] = $leave['leavetype'];
-            $result[$leave['id']]['leavestatus '] = $leave['leavestatus'];
-            $result[$leave['id']]['startdate'] = $leave['startdate'];
-            $result[$leave['id']]['enddate'] = $leave['enddate'];
-            $result[$leave['id']]['duration'] = $leave['duration'];
-            $result[$leave['id']]['durationoutsideofperiod'] = $leave['durationoutsideofperiod'];
-            $result[$leave['id']]['daysoffoutsideofperiod'] = $leave['daysoffoutsideofperiod'];
-            $result[$leave['id']]['halfdayadjustment'] = $leave['halfdayadjustment'];
-            $result[$leave['id']]['effectiveduration'] = $leave['effectiveduration'];
-            if ($requests) $leave_requests[$leave['id']] = $this->leaves_model->getLeavesBetweenDates($start, $end);
+            $result[$leave['userid']]['userid'] = $leave['userid'];
+            $result[$leave['userid']]['firstname'] = $leave['firstname'];
+            $result[$leave['userid']]['lastname'] = $leave['lastname'];
+            $result[$leave['userid']]['type'] = $leave['type'];
+            $result[$leave['userid']]['leavetype'] = $leave['leavetype'];
+            $result[$leave['userid']]['duration'] = $leave['duration'];
+            if ($requests) $leave_requests[$leave['id']] = getLeavesBetweenDates($start, $end);
         }
 
         $table = '';
         $thead = '';
         $tbody = '';
         $line = 2;
-        $i18 = array("id", "userid", "firstname", "lastname", "type", "leavetype", "leavestatus", "startdate", "enddate", "duration", "durationoutsideofperiod", "daysoffoutsideofperiod", "halfdayadjustment", "effectiveduration");
+        $i18 = array("id", "userid", "firstname", "lastname", "type", "leavetype", "duration");
         foreach ($result as $user_id => $row) {
             $index = 1;
             $tbody .= '<tr>';
@@ -478,6 +475,7 @@ class Reports extends CI_Controller {
             $tbody .
             '</tbody>' .
             '</table>';
+
         $this->output->set_output($table);
     }
 

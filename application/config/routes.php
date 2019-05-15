@@ -261,7 +261,9 @@ $route['reports/balance/execute'] = 'reports/executeBalanceReport';
 $route['reports/balance/export'] = 'reports/exportBalanceReport';
 $route['reports/leaves'] = 'reports/leaves';
 $route['reports/leaves/execute'] = 'reports/executeLeavesReport';
+$route['reports/leaves/executeDates'] = 'reports/executeLeavesReportBetweenDates';
 $route['reports/leaves/export'] = 'reports/exportLeavesReport';
+$route['reports/leaves/exportDates'] = 'reports/exportLeavesReportBewteenDates';
 $route['reports'] = 'reports';
 
 //_______________________________________________
