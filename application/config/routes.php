@@ -263,7 +263,7 @@ $route['reports/leaves'] = 'reports/leaves';
 $route['reports/leaves/execute'] = 'reports/executeLeavesReport';
 $route['reports/leaves/executeDates'] = 'reports/executeLeavesReportBetweenDates';
 $route['reports/leaves/export'] = 'reports/exportLeavesReport';
-$route['reports/leaves/exportDates'] = 'reports/exportLeavesReportBewteenDates';
+$route['reports/leaves/exportDates'] = 'reports/exportLeavesReportBetweenDates';
 $route['reports'] = 'reports';
 
 //_______________________________________________

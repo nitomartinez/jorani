@@ -404,7 +404,7 @@ class Reports extends CI_Controller {
         $children = filter_var($this->input->get("children"), FILTER_VALIDATE_BOOLEAN);
         $requests = filter_var($this->input->get("requests"), FILTER_VALIDATE_BOOLEAN);
 
-        //Compute facts about dates and the selected month
+        //Compute facts about dates
         if ($startdate == 0 || $enddate == 0) {
             $start = date('Y-01-01');
             $end = date('Y-12-31');
@@ -437,7 +437,6 @@ class Reports extends CI_Controller {
             $result[$leave['userid']]['type'] = $leave['type'];
             $result[$leave['userid']]['leavetype'] = $leave['leavetype'];
             $result[$leave['userid']]['duration'] = $leave['duration'];
-            if ($requests) $leave_requests[$leave['id']] = getLeavesBetweenDates($start, $end);
         }
 
         $table = '';
@@ -486,12 +485,23 @@ class Reports extends CI_Controller {
      */
     public function exportLeavesReportBetweenDates()
     {
+        ob_start();
+        require 'C:\xampp\htdocs\joraniHours\jorani\local\pages\en\hour-aware-report.php';
+        ob_end_clean();
+        
         $this->auth->checkIfOperationIsAllowed('native_report_leaves');
         $this->lang->load('leaves', $this->language);
         $this->load->model('organization_model');
         $this->load->model('leaves_model');
         $this->load->model('types_model');
         $this->load->model('dayoffs_model');
+
+        $startdate = $this->input->get("startdate") === FALSE ? 0 : $this->input->get("startdate");
+        $enddate = $this->input->get("enddate") === FALSE ? 0 : $this->input->get("enddate");
+
+        $data['startdate'] = $startdate; 
+        $data['enddate'] = $enddate; 
+
         $data['refDate'] = date("Y-m-d");
         if (isset($_GET['refDate']) && $_GET['refDate'] != NULL) {
             $data['refDate'] = date("Y-m-d", $_GET['refDate']);

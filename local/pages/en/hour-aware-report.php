@@ -396,10 +396,16 @@ $(document).ready(function() {
     $('#cmdExportReport').click(function() {
         var rtpQuery = '<?php echo base_url();?>reports/leaves/exportDates';
         var tmpUnix = moment($("#refdate").datepicker("getDate")).utc().unix();
+        var startdate = $("#startdate").val();
+        var enddate = $("#enddate").val();
         if (entity != -1) {
             rtpQuery += '?entity=' + entity;
         } else {
             rtpQuery += '?entity=0';
+        }
+
+        if (startdate == 0 || enddate == 0) {
+                bootbox.alert("<?php echo lang('leaves_flash_msg_hourly_reports_days_report');?>");
         }
         rtpQuery += '&startdate=' + startdate;
         rtpQuery += '&enddate=' + enddate;
