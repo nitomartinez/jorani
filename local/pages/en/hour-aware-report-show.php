@@ -21,16 +21,18 @@ require (dirname(__DIR__).'\..\reports\hour-aware-functions.php');
 
     $result = array();
     $leave_requests = array();
+    $index = 0;
 
     foreach ($leavesBetweenDates as $leave) {
-        $result[$leave['userid']]['userid'] = $leave['userid'];
-        $result[$leave['userid']]['firstname'] = $leave['firstname'];
-        $result[$leave['userid']]['lastname'] = $leave['lastname'];
-        $result[$leave['userid']]['type'] = $leave['type'];
-        $result[$leave['userid']]['leavetype'] = $leave['leavetype'];
-        $result[$leave['userid']]['duration'] = $leave['duration'];
+        $result[$index]['userid'] = $leave['userid'];
+        $result[$index]['lastname'] = $leave['lastname'];
+        $result[$index]['firstname'] = $leave['firstname'];
+        $result[$index]['type'] = $leave['type'];
+        $result[$index]['leavetype'] = $leave['leavetype'];
+        $result[$index]['duration'] = $leave['duration'];
 
         if ($requests) $leave_requests[$leave['userid']] = $this->leaves_model->getAcceptedLeavesBetweenDates($leave['userid'], $startdate, $enddate);
+        $index++;
     }
 
 
