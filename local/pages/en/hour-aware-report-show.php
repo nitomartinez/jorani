@@ -1,6 +1,6 @@
 <?php
 
-require (dirname(__DIR__).'\..\reports\hour-aware-functions.php');
+require (dirname(__DIR__).'/../reports/hour-aware-functions.php');
 
 
     $this->auth->checkIfOperationIsAllowed('native_report_leaves');
@@ -109,4 +109,4 @@ require (dirname(__DIR__).'\..\reports\hour-aware-functions.php');
         '</table>';
 
     $this->output->set_output($table);
-
+?>
