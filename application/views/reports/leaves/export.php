@@ -45,9 +45,7 @@ $leave_requests = array();
 
 //Iterate on all employees of the entity
 $users = $this->organization_model->allEmployees($entity, $children);
-
 $result = array();
-
 foreach ($users as $user) {
     $result[$user->id]['identifier'] = $user->identifier;
     $result[$user->id]['firstname'] = $user->firstname;
@@ -59,7 +57,8 @@ foreach ($users as $user) {
     $result[$user->id]['contract'] = $user->contract;
     $non_working_days = $this->dayoffs_model->lengthDaysOffBetweenDates($user->contract_id, $start, $end);
     $opened_days = $total_days - $non_working_days;
-  //If the user has selected All months
+
+    //If the user has selected All months
     if ($month == 0) {
         $leave_duration = 0;
         for ($ii = 1; $ii <13; $ii++) {
@@ -80,7 +79,7 @@ foreach ($users as $user) {
             }
         }
         if ($requests) $leave_requests[$user->id] = $this->leaves_model->getAcceptedLeavesBetweenDates($user->id, $start, $end);
-            $work_duration = $opened_days - $leave_duration;
+        $work_duration = $opened_days - $leave_duration;
     } else {
         $linear = $this->leaves_model->linear($user->id, $month, $year, FALSE, FALSE, TRUE, FALSE);
         $leave_duration = $this->leaves_model->monthlyLeavesDuration($linear);
@@ -96,6 +95,10 @@ foreach ($users as $user) {
             }
         }
     }
+    $result[$user->id]['leave_duration'] = $leave_duration;
+    $result[$user->id]['total_days'] = $total_days;
+    $result[$user->id]['non_working_days'] = $non_working_days;
+    $result[$user->id]['work_duration'] = $work_duration;
 }
 
 $max = 0;
