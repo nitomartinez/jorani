@@ -51,6 +51,14 @@ echo form_open('leaves/create', $attributes) ?>
     <?php } else { ?>
     <input type="text" name="duration" id="duration" value="<?php echo set_value('duration'); ?>" />
     <?php } ?>
+    <?php if ($this->config->item('allow_hourly_leave_duration') == TRUE) { ?>
+    <!-- <label for="durationtype"><?php echo lang('leaves_create_field_duration_type');?></label> -->
+    <select name="durationtype" id="durationtype">
+        <option value="days" selected><?php echo lang('days');?></option>
+        <option value="hours"><?php echo lang('hours');?></option>
+    </select>
+    <?php } ?><br />
+
 
     <span style="margin-left: 2px;position: relative;top: -5px;" id="spnDayType"></span>
 
@@ -67,6 +75,11 @@ echo form_open('leaves/create', $attributes) ?>
     <div class="alert hide alert-error" id="lblOverlappingDayOffAlert" onclick="$('#lblOverlappingDayOffAlert').hide();">
         <button type="button" class="close">&times;</button>
         <?php echo lang('leaves_flash_msg_overlap_dayoff');?>
+    </div>
+
+    <div class="alert hide alert-error" id="lblHourlyRequestBeyondLimitsAlert" onclick="$('#lblHourlyRequestBeyondLimitsAlert').hide();">
+        <button type="button" class="close">&times;</button>
+        <?php echo lang('leaves_flash_msg_hourly_reports_beyond_limits');?>
     </div>
 
     <label for="cause"><?php echo lang('leaves_create_field_cause');?></label>
@@ -123,8 +136,35 @@ $(document).on("click", "#showNoneWorkedDay", function(e) {
     var overlappingWithDayOff = "<?php echo lang('leaves_flash_msg_overlap_dayoff');?>";
     var listOfDaysOffTitle = "<?php echo lang('leaves_flash_spn_list_days_off');?>";
 
+<?php if ($this->config->item('allow_hourly_leave_duration') == TRUE) { ?>
+function updateDurationIfDurationTypeIsHours() {
+    var durationtype = $.trim($('#durationtype').val());
+    if (durationtype == "hours") {
+        // TODO Check that it only allows 1 day and only max 8 hours
+        var start = $('#startdate').val();
+        var end = $('#enddate').val();
+        var durationfield = $('#duration').val();
+        console.log("updateDurationIfDurationTypeIsHours: start " + start +", end " + end);
+        if (start != end || durationfield > 8) {
+            bootbox.alert("<?php echo lang('leaves_flash_msg_hourly_reports_beyond_limits');?>");
+            return false;
+        }
+        // Divide hours by 8
+        var duration = Math.round(durationfield * 1000 / 8) / 1000;  //Round to 3 decimals only if necessary
+        console.log("accountHourDurationInDays: durationtype is hours, dividing duration by 8");
+        $('#duration').val(duration);
+        $('#durationtype').val("days");
+        return true;
+    }
+}
+<?php } ?>
+
 function validate_form() {
     var fieldname = "";
+
+<?php if ($this->config->item('allow_hourly_leave_duration') == TRUE) { ?>
+    if (updateDurationIfDurationTypeIsHours() == false) return false;
+<?php } ?>
 
     //Call custom trigger defined into local/triggers/leave.js
     if (typeof triggerValidateCreateForm == 'function') {

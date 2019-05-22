@@ -92,6 +92,8 @@ function getLeaveInfos(preventDefault) {
             showOverlappingMessage(leaveInfo);
             //Or overlaps with a non-working day
             showOverlappingDayOffMessage(leaveInfo);
+            //Or show hourly report on more than one day
+            showHourlyDurationBeyondLimits(leaveInfo);
             //Check if the employee has a contract
             if (leaveInfo.hasContract == false) {
                 bootbox.alert(noContractMsg);
@@ -133,6 +135,7 @@ function refreshLeaveInfo() {
         .done(function(leaveInfo) {
             showOverlappingMessage(leaveInfo);
             showOverlappingDayOffMessage(leaveInfo);
+            showHourlyDurationBeyondLimits(leaveInfo);
             showListDayOff(leaveInfo);
             $('#frmModalAjaxWait').modal('hide');
         });
@@ -240,6 +243,28 @@ function showOverlappingDayOffMessage(leaveInfo) {
     }
 }
 
+function showHourlyDurationBeyondLimits(leaveInfo) {
+    var durationtype = $('#durationtype').val();
+    if (typeof durationtype === "undefined" || durationtype !== "hours") {
+        console.log("showHourlyDurationBeyondLimits not aplicable durationtype="+durationtype);
+        return;
+    }
+    var durationfield = $('#duration').val();
+    console.log("showHourlyDurationBeyondLimits. Duration:" + durationfield + ", durationtype:" + durationtype +",leaveInfo:" + JSON.stringify(leaveInfo));
+    if (typeof durationfield === "undefined") {
+        console.log("showHourlyDurationBeyondLimits. Durationfield is undefined");
+        durationfield = 0;
+    }
+
+    if ((leaveInfo.RequestStartDate != leaveInfo.RequestEndDate) || (durationfield > 8)) {
+        console.log("showHourlyDurationBeyondLimits. show");
+        $('#lblHourlyRequestBeyondLimitsAlert').show();
+    } else {
+        console.log("showHourlyDurationBeyondLimits. hide");
+        $('#lblHourlyRequestBeyondLimitsAlert').hide();
+    }
+}
+
 $(function () {
     getLeaveLength(false);
 
@@ -278,6 +303,7 @@ $(function () {
     $('#viz_enddate').change(function() {getLeaveLength();});
     $('#startdatetype').change(function() {getLeaveLength();});
     $('#enddatetype').change(function() {getLeaveLength();});
+    $('#durationtype').change(function() {getLeaveLength();});
     $('#type').change(function() {getLeaveInfos(false);});
 
     //Check if the user has not exceed the number of entitled days
