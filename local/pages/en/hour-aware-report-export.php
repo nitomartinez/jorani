@@ -7,7 +7,7 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
-require (dirname(__DIR__).'\..\reports\hour-aware-functions.php');
+require (dirname(__DIR__).'/../reports/hour-aware-functions.php');
 
 $this->auth->checkIfOperationIsAllowed('native_report_leaves');
 $this->lang->load('leaves', $this->language);
@@ -96,3 +96,4 @@ for ($ii=1; $ii <$max; $ii++) {
 
 $spreadsheet->exportName = 'leave_requests_'. $startdate . '_' . $enddate;
 writeSpreadsheet($spreadsheet);
+?>
