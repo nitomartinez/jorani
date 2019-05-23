@@ -86,7 +86,7 @@ function getLeavesBetweenDates($ci, $startdate, $enddate) {
 
     
     $createtemptable = <<<EOF
-create or replace temporary table $tablename
+create temporary table if not exists $tablename as
 -- 
 -- The list of reports are the reports is the union of the following reports
 -- - leaves that are between the start and the end date
@@ -263,8 +263,7 @@ EOF3;
     foreach ($leavetypes as $id => $type) {
         $query .= <<<EOF4
         ,sum(coalesce(
-         (select duration
-          where type = $id)
+        (IF(type=$id,duration,0))
        ,0)) as '$type'
 EOF4;
     }
@@ -294,4 +293,5 @@ EOF4;
 
     return $rows2;
 }
+
 ?>
