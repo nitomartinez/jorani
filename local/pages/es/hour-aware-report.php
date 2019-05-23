@@ -24,16 +24,6 @@ $this->load->model('organization_model');
             <input type="text" name="enddate" id="enddate" />
     </div>
     <div class="span3">
-        <label for="txtEntity"><?php echo lang('reports_leaves_field_entity');?></label>
-        <div class="input-append">
-        <input type="text" id="txtEntity" name="txtEntity" readonly />
-        <button id="cmdSelectEntity" class="btn btn-primary"><?php echo lang('reports_leaves_button_entity');?></button>
-        </div>
-        <label for="chkIncludeChildren">
-                <input type="checkbox" id="chkIncludeChildren" name="chkIncludeChildren" checked /> <?php echo lang('reports_leaves_field_subdepts');?>
-        </label>
-    </div>
-    <div class="span3">
         <div class="pull-right">
             &nbsp;
             <button class="btn btn-primary" id="cmdLaunchReport"><i class="mdi mdi-file-chart"></i>&nbsp; <?php echo lang('reports_leaves_button_launch');?></button>
