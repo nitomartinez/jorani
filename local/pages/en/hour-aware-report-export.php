@@ -62,7 +62,7 @@ foreach ($result as $index => $row) {
     $columnIndex = 1;
     foreach ($row as $key => $value) {
         if ($line == 2) {
-            $colidx = $this->excel->column_name($columnIndex) . '1';
+            $colidx = $ci->excel->column_name($columnIndex) . '1';
             if (in_array($key, $i18n)) {
                 $sheet->setCellValue($colidx, $key);
             } else {
@@ -70,7 +70,7 @@ foreach ($result as $index => $row) {
             }
             $max++;
         }
-        $colidx = $this->excel->column_name($columnIndex) . $line;
+        $colidx = $ci->excel->column_name($columnIndex) . $line;
         $sheet->setCellValue($colidx, $value);
         $columnIndex++;
     }
@@ -78,13 +78,13 @@ foreach ($result as $index => $row) {
     $line++;
 }
 
-$colidx = $this->excel->column_name($max) . '1';
+$colidx = $ci->excel->column_name($max) . '1';
 $sheet->getStyle('A1:' . $colidx)->getFont()->setBold(true);
 $sheet->getStyle('A1:' . $colidx)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
 //Autofit
 for ($ii=1; $ii <$max; $ii++) {
-    $col = $this->excel->column_name($ii);
+    $col = $ci->excel->column_name($ii);
     $sheet->getColumnDimension($col)->setAutoSize(TRUE);
 }
 
