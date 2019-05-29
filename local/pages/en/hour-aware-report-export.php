@@ -1,12 +1,5 @@
 <?php
 
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-
 require (dirname(__DIR__).'/../reports/hour-aware-functions.php');
 
 $this->auth->checkIfOperationIsAllowed('native_report_leaves');
@@ -31,8 +24,9 @@ $data['include_children'] = filter_var($_GET['children'], FILTER_VALIDATE_BOOLEA
 
 // require_once FCPATH . "vendor/autoload.php";
 
-$spreadsheet = new Spreadsheet();
-$sheet = $spreadsheet->getActiveSheet();
+$ci = get_instance();
+$ci->load->library('excel');
+$sheet = $ci->excel->setActiveSheetIndex(0);
 
 $sheet->setTitle(mb_strimwidth(lang('reports_export_leaves_title'), 0, 28, "..."));  //Maximum 31 characters allowed in sheet title.
 
@@ -86,7 +80,7 @@ foreach ($result as $index => $row) {
 
 $colidx = columnName($max) . '1';
 $sheet->getStyle('A1:' . $colidx)->getFont()->setBold(true);
-$sheet->getStyle('A1:' . $colidx)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+$sheet->getStyle('A1:' . $colidx)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
 //Autofit
 for ($ii=1; $ii <$max; $ii++) {
