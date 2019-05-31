@@ -88,6 +88,10 @@ for ($ii=1; $ii <$max; $ii++) {
     $sheet->getColumnDimension($col)->setAutoSize(TRUE);
 }
 
+/*
 $spreadsheet->exportName = 'leave_requests_'. $startdate . '_' . $enddate;
 writeSpreadsheet($spreadsheet);
+*/
+$filename = 'leave_requests_'. $startdate . '_' . $enddate;
+exportSpreadsheet($this, 'leave_requests');
 ?>
