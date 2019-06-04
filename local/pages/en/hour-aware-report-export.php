@@ -93,5 +93,5 @@ $spreadsheet->exportName = 'leave_requests_'. $startdate . '_' . $enddate;
 writeSpreadsheet($spreadsheet);
 */
 $filename = 'leave_requests_'. $startdate . '_' . $enddate;
-exportSpreadsheet($this, 'leave_requests');
+exportSpreadsheet($ci, 'leave_requests');
 ?>
